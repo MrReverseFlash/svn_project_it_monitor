@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.envisioniot.uscada.monitor.web.mapper.fdb.read.DbFRMapper">
+
+	<select id="getDbAlarm" resultType="com.envisioniot.uscada.monitor.web.entity.AlarmResponse">
+		select t1.occur_time occurTime,
+				t2.db_tag || "[" || t2.db_ip || ":" || t2.db_port || "]" alarmObject,
+				t1.alarm_content alarmContent,
+				t1.alarm_type alarmType
+		from monitor_db_alarm_his t1 left join monitor_db_info t2 on t1.db_id = t2.id
+		where t1.db_id = #{dbId}
+		  and t1.occur_time &lt;= #{et}
+		  and t1.occur_time &gt;= #{st}
+		order by t1.db_id desc, t1.occur_time desc
+    </select>
+
+</mapper>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.envisioniot.uscada.monitor.transfer.mapper.comm.AppCommMapper">
+    <resultMap id="AppObj" type="com.envisioniot.uscada.monitor.common.entity.AppObj">
+        <result property="appUid" column="app_uid"/>
+        <result property="containerName" column="container_name"/>
+    </resultMap>
+
+    <select id="getMonitorApps" resultMap="AppObj">
+        select
+            app_uid app_uid,
+            container_name container_name
+        from monitor_app_info where host_ip = #{host_ip}
+    </select>
+</mapper>

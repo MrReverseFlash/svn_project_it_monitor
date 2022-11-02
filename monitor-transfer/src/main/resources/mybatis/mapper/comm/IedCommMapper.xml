@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.envisioniot.uscada.monitor.transfer.mapper.comm.IedCommMapper">
+    <select id="getMonitorObj" resultType="com.envisioniot.uscada.monitor.common.entity.IedInfo">
+        select
+            ied_alias as iedAlias,
+            ied_name as iedName,
+            peer_ip as peerIp,
+            port as port,
+            comm_type as commType
+        from monitor_fe_info where host_ip=#{host_ip}
+    </select>
+</mapper>

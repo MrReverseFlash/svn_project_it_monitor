@@ -1,0 +1,42 @@
+server:
+  port: 6528
+  servlet:
+    context-path: /monitor-web
+#日志文件输出路径
+logging:
+  config: config/logback.xml
+
+# 数据库 相关设置
+spring:
+  influx:
+    # 0表示NONE, 1表示BASIC, 2表示HEADERS，3表示FULL
+    logLevel: 0
+    url: http://127.0.0.1:7086
+    user: pro_envision
+    password: pro_envision
+    database: pro_envision
+  # 下面是测试配置，生产需要放开上面 TODO YK
+#  influx:
+#    # 0表示NONE, 1表示BASIC, 2表示HEADERS，3表示FULL
+#    logLevel: 3
+#    url: http://172.16.71.74:7086
+#    user: pro_envision
+#    password: pro_envision
+#    database: pro_envision
+  datasource:
+    # 数据库连接池配置
+    type: com.alibaba.druid.pool.DruidDataSource
+    # init sql 建表语句适配FDB->改为动态设置该属性（如果是MySQL才设置）
+#    initialization-mode: always
+#    schema:
+#      - file:sql/create_table_v0.1.sql
+#SCADA地址（推送告警与校验sessionId）
+uscadaIp: 127.0.0.1
+# 下面是测试配置，生产需要放开上面 TODO YK
+#uscadaIp: 172.16.71.74
+#浏览器的SCADAWEB地址（用于给前端嵌套进SCADANEW，拿cookie。当有Nginx时，该值和 uscadaIp 值会不一样） TODO YK 20220210 自动部署脚本修改该值
+#当为空时，表示不集成到SCADAWEB，为独立部署查看模式
+browserScadawebUrl:
+#标记本条主机信息所属层级(如一区、三区，主机状态告警扫描只会扫描本层级主机)
+host:
+  matchFlag: "localhost"

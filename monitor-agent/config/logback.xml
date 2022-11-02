@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <!--控制台输出-->
+    <appender name="Console-Appender" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}][%thread][%file:%line][%level] %msg%n</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <!-- RollingFileAppender：滚动记录文件，先将日志记录到指定文件，当符合某个条件时，将日志记录到其他文件 -->
+    <appender name="Rolling-Appender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>./log/monitor-agent.log</file>
+        <!-- 按照天来生成日志-->
+        <!--<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">-->
+        <!--<fileNamePattern>${PRJHOME}/log/monitor-agent.%d{yyyy-MM-dd}.log</fileNamePattern>-->
+        <!--<maxHistory>30</maxHistory>-->
+        <!--<totalSizeCap>10MB</totalSizeCap>-->
+        <!--</rollingPolicy>-->
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>./log/monitor-agent.-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <maxFileSize>10MB</maxFileSize>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}][%thread][%file:%line][%level] %msg%n</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+<!--    <logger name="com.envisioniot.uscada.monitor.agent" additivity="true">-->
+<!--        <appender-ref ref="Rolling-Appender" level="INFO"/>-->
+<!--    </logger>-->
+
+    <root level="INFO">
+        <appender-ref ref="Console-Appender"/>
+        <appender-ref ref="Rolling-Appender"/>
+    </root>
+
+    <!--测试配置，生产需要放开 TODO YK-->
+<!--    <logger name="com.envisioniot.uscada.monitor.agent" additivity="true">-->
+<!--        <appender-ref ref="Console-Appender" level="DEBUG"/>-->
+<!--    </logger>-->
+
+<!--    <root level="DEBUG">-->
+<!--        <appender-ref ref="Console-Appender"/>-->
+<!--    </root>-->
+</configuration>

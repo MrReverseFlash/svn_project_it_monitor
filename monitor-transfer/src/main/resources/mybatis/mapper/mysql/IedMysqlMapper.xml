@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.envisioniot.uscada.monitor.transfer.mapper.mysql.IedMysqlMapper">
+    <insert id="insertBatch">
+        INSERT IGNORE INTO monitor_fe_info (host_ip,ied_alias,ied_name,peer_ip,port,comm_type,create_time) VALUES
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{host_ip},#{item.iedAlias},#{item.iedName},#{item.peerIp},#{item.port},#{item.commType},now())
+        </foreach>
+    </insert>
+
+    <insert id="batchForUpdate">
+        <foreach collection="list" item="item" index="index" separator=";">
+            INSERT INTO monitor_fe_info
+            (host_ip,ied_alias,ied_name,peer_ip,port,status,msg,occur_time,comm_type,create_time)
+            VALUES (
+            #{host_ip},
+            #{item.iedAlias},
+            #{item.iedName},
+            #{item.peerIp},
+            #{item.port},
+            #{item.status},
+            #{item.msg},
+            #{item.occurTime},
+            #{item.commType},
+            now())
+            ON DUPLICATE KEY UPDATE
+            status=#{item.status},
+            msg=#{item.msg},
+            occur_time=#{item.occurTime},
+            update_time=now()
+        </foreach>
+    </insert>
+</mapper>

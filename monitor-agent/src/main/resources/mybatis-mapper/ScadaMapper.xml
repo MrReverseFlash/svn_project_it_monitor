@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.envisioniot.uscada.monitor.agent.mapper.ScadaMapper">
+    <resultMap id="IedStat" type="com.envisioniot.uscada.monitor.common.entity.IedStat">
+        <result property="iedAlias" column="ied_alias"/>
+        <result property="iedName" column="ied_name"/>
+        <result property="peerIp" column="ip1"/>
+        <result property="port" column="net_port_1"/>
+        <result property="commType" column="comm_type"/>
+    </resultMap>
+    <select id="getAllIedInfo" resultMap="IedStat">
+        select ied_alias ied_alias, ied_name ied_name, ip1 ip1, net_port_1 net_port_1, comm_type comm_type
+        from ied_info
+    </select>
+
+    <select id="getDistinctHostIp" resultType="int">
+        select distinct ip1 ip1
+        from ied_info
+        where ip1 != 0
+    </select>
+</mapper>

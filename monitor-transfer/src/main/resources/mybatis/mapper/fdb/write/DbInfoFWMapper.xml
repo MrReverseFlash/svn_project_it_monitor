@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.envisioniot.uscada.monitor.transfer.mapper.fdb.write.DbInfoFWMapper">
+    <insert id="insertBatch">
+        INSERT OR IGNORE INTO monitor_db_info (id,host_ip,db_ip,db_type,db_name,db_user,db_passwd,db_port,create_time,db_version,status) VALUES
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.id},#{host_ip},#{item.dbIp},#{item.dbType},#{item.dbName},#{item.user},#{item.passwd},#{item.dbPort},datetime('now', 'localtime'),#{item.version},#{item.status})
+        </foreach>
+    </insert>
+
+    <update id="batchForUpdate_update_first">
+        <foreach collection="list" item="item" index="index" separator=";">
+            update monitor_db_info set
+                status=#{item.status},
+                questions=#{item.questions},
+                commit_num=#{item.commitNum},
+                rollback_num=#{item.rollbackNum},
+                conn_max=#{item.connMax},
+                use_con=#{item.useCon},
+                msg=#{item.msg},
+                occur_time=#{item.occurTime},
+                update_time=datetime('now', 'localtime'),
+                up_time=#{item.upTime},
+                db_version=#{item.version}
+            where host_ip = #{host_ip}
+              and db_ip = #{item.dbIp}
+              and db_type = #{item.dbType}
+              and db_name = #{item.dbName}
+        </foreach>
+    </update>
+    <select id="selectIdByInfo" resultType="java.lang.String">
+        select id from monitor_db_info where host_ip = #{host_ip} and db_ip = #{db.dbIp} and
+            db_type = #{db.dbType} and db_name = #{db.dbName}
+    </select>
+
+    <insert id="batchForUpdate_insert_later">
+        <foreach collection="list" item="item" index="index" separator=";">
+            INSERT OR IGNORE INTO monitor_db_info
+            (id,host_ip,db_ip,db_type,db_name,db_user,db_passwd,db_port,status,db_version,questions,commit_num,rollback_num,conn_max,use_con,msg,occur_time,create_time,up_time)
+            VALUES (
+            #{item.id},
+            #{host_ip},
+            #{item.dbIp},
+            #{item.dbType},
+            #{item.dbName},
+            #{item.user},
+            #{item.passwd},
+            #{item.dbPort},
+            #{item.status},
+            #{item.version},
+            #{item.questions},
+            #{item.commitNum},
+            #{item.rollbackNum},
+            #{item.connMax},
+            #{item.useCon},
+            #{item.msg},
+            #{item.occurTime},
+            datetime('now', 'localtime'),
+            #{item.upTime}
+            )
+        </foreach>
+    </insert>
+
+    <insert id="insert_insert_first">
+        INSERT OR IGNORE INTO monitor_db_info (id,host_ip,db_ip,db_type,db_name,db_user,db_passwd,db_port,create_time) VALUES
+        (#{db.id},#{host_ip},#{db.dbIp},#{db.dbType},#{db.dbName},#{db.user},#{db.passwd},#{db.dbPort},datetime('now', 'localtime'))
+    </insert>
+</mapper>

@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.envisioniot.uscada.monitor.web.mapper.comm.DbCommMapper">
+	<resultMap id="dbMap" type="com.envisioniot.uscada.monitor.web.entity.DbInfo">
+		<id column="id" property="id"/>
+		<result column="db_name" property="dbName" />
+		<result column="db_type" property="dbType" />
+		<result column="db_user" property="user" />
+		<result column="db_passwd" property="passwd" />
+		<result column="db_ip" property="dbIp" />
+		<result column="db_port" property="dbPort" />
+		<result column="db_version" property="version" />
+		<result column="status" property="status" />
+		<result column="host_ip" property="hostIp" />
+		<result column="db_tag" property="dbTag" />
+		<result column="up_time" property="upTime" />
+		<result column="questions" property="questions" />
+		<result column="commit_num" property="commitNum" />
+		<result column="rollback_num" property="rollbackNum" />
+		<result column="conn_max" property="connMax" />
+		<result column="use_con" property="useCon" />
+		<result column="msg" property="msg" />
+		<result column="create_time" property="createTime" />
+		<result column="update_time" property="updateTime" />
+		<result column="host_status" property="hostStatus" />
+	</resultMap>
+
+
+	<resultMap id="tableMap" type="com.envisioniot.uscada.monitor.web.entity.TableInfo">
+		<id column="id" property="id"/>
+		<result column="table_name" property="tableName" />
+		<result column="description" property="description" />
+		<result column="exec_sql" property="execSql" />
+		<result column="record_num" property="recordNum" />
+		<result column="create_time" property="createTime" />
+		<result column="update_time" property="updateTime" />
+		<association property="dbInfo" resultMap="dbMap" javaType="com.envisioniot.uscada.monitor.web.entity.DbInfo" columnPrefix="dbinfo_" />
+	</resultMap>
+
+
+	<resultMap id="dbSampleReqMap" type="com.envisioniot.uscada.monitor.web.entity.DbSampleReq">
+		<result column="host_ip" property="hostIp" />
+		<result column="db_ip" property="dbIp" />
+		<result column="db_type" property="dbType" />
+		<result column="db_name" property="dbName" />
+	</resultMap>
+
+
+	<resultMap id="tableSampleReqMap" type="com.envisioniot.uscada.monitor.web.entity.TableSampleReq">
+		<result column="host_ip" property="hostIp" />
+		<result column="db_ip" property="dbIp" />
+		<result column="db_type" property="dbType" />
+		<result column="db_name" property="dbName" />
+		<result column="table_name" property="tableName" />
+	</resultMap>
+
+
+	<sql id="qryDbList">
+		t1.id id, t1.db_name db_name, t1.db_type db_type, t1.db_user db_user, t1.db_ip db_ip, t1.db_port db_port, t1.db_version db_version, t1.status status,
+		t1.host_ip host_ip, t1.db_tag db_tag, t1.up_time up_time, t1.questions questions, t1.commit_num commitNum, t1.rollback_num rollbackNum, t1.conn_max conn_max,
+		t1.use_con use_con, t1.msg msg, t1.create_time create_time, t1.update_time update_time, t2.status host_status
+	</sql>
+
+
+	<sql id="qryTableList">
+		t1.id id, t1.table_name table_name, t1.description description, t1.exec_sql exec_sql, t1.record_num record_num,
+       	t1.create_time create_time, t1.update_time update_time, t1.db_id dbinfo_id, t2.host_ip dbinfo_host_ip,
+       	t2.db_ip dbinfo_db_ip, t2.db_type dbinfo_db_type, t2.db_name dbinfo_db_name,
+       	t2.db_tag dbinfo_db_tag, t2.status dbinfo_status, t3.status dbinfo_host_status
+	</sql>
+
+	<select id="qryDbList" resultMap="dbMap" parameterType="string">
+		SELECT
+		<include refid="qryDbList" />
+		FROM monitor_db_info t1 left join monitor_host_info t2 on t1.host_ip = t2.host_ip
+		<if test="hostIp != null and hostIp != ''">
+			where t1.host_ip = #{hostIp}
+		</if>
+		order by t1.host_ip
+	</select>
+
+
+	<select id="qryAllTable" resultMap="tableMap">
+		select
+		<include refid="qryTableList" />
+		from monitor_table_info t1
+		LEFT JOIN monitor_db_info t2 ON t1.db_id = t2.id
+		LEFT JOIN monitor_host_info t3 on t2.host_ip = t3.host_ip
+		order by t2.host_ip
+	</select>
+
+
+	<select id="qryDbSampleReqByIds" parameterType="list" resultMap="dbSampleReqMap">
+		select host_ip host_ip, db_ip db_ip, db_type db_type, db_name db_name from monitor_db_info where id in
+		<foreach collection="list" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</select>
+
+
+	<select id="qryTableSampleReqByIds" parameterType="list" resultMap="tableSampleReqMap">
+		select t1.table_name table_name, t2.host_ip host_ip, t2.db_ip db_ip, t2.db_type db_type, t2.db_name db_name
+		from monitor_table_info t1 LEFT JOIN monitor_db_info t2 ON t1.db_id = t2.id
+		where t1.id in
+		<foreach collection="list" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</select>
+
+
+	<select id="qryTableSampleReqByDbIds" parameterType="list" resultMap="tableSampleReqMap">
+		select t1.table_name table_name, t2.host_ip host_ip, t2.db_ip db_ip, t2.db_type db_type, t2.db_name db_name
+		from monitor_table_info t1 LEFT JOIN monitor_db_info t2 ON t1.db_id = t2.id
+		where t1.db_id in
+		<foreach collection="list" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</select>
+</mapper>

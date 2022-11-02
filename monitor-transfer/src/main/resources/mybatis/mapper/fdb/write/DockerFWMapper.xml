@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.envisioniot.uscada.monitor.transfer.mapper.fdb.write.DockerFWMapper">
+    <insert id="insertBatch">
+        INSERT OR IGNORE INTO monitor_docker_info
+        (host_ip,container_id,container_name,image,create_time,uptime,container_create_time,status) VALUES
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{host_ip},#{item.id},#{item.name},#{item.image},datetime('now', 'localtime'),#{item.upTime},#{item.containerCreateTime},#{item.status})
+        </foreach>
+    </insert>
+
+    <insert id="batchForUpdate_update_first">
+        <foreach collection="list" item="item" index="index" separator=";">
+            UPDATE monitor_docker_info SET
+                container_name=#{item.name},
+                status=#{item.status},
+                uptime=#{item.upTime},
+                container_create_time=#{item.containerCreateTime},
+                mem_per=#{item.memPer},
+                cpu_per=#{item.cpuPer},
+                net_io_send=#{item.netIoSend},
+                net_io_receive=#{item.netIoReceive},
+                block_io_read=#{item.blockIoRead},
+                block_io_write=#{item.blockIoWrite},
+                pids=#{item.pids},
+                msg=#{item.msg},
+                image=#{item.image},
+                occur_time=#{item.occurTime},
+                update_time=datetime('now', 'localtime')
+            WHERE host_ip = #{host_ip}
+              AND container_id = #{item.id}
+        </foreach>
+    </insert>
+
+    <insert id="batchForUpdate_insert_later">
+        <foreach collection="list" item="item" index="index" separator=";">
+            INSERT OR IGNORE INTO monitor_docker_info
+            (host_ip,container_id,container_name,status,uptime,container_create_time,mem_per,cpu_per,net_io_send,net_io_receive,block_io_read,block_io_write,pids,msg,image,occur_time,create_time) VALUES (
+            #{host_ip},
+            #{item.id},
+            #{item.name},
+            #{item.status},
+            #{item.upTime},
+            #{item.containerCreateTime},
+            #{item.memPer},
+            #{item.cpuPer},
+            #{item.netIoSend},
+            #{item.netIoReceive},
+            #{item.blockIoRead},
+            #{item.blockIoWrite},
+            #{item.pids},
+            #{item.msg},
+            #{item.image},
+            #{item.occurTime},
+            datetime('now', 'localtime'))
+        </foreach>
+    </insert>
+</mapper>

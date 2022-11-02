@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.envisioniot.uscada.monitor.transfer.mapper.comm.TopoCommMapper">
+
+    <select id="qryRelaByHost" resultType="string">
+        select host_ip_target host_ip_target
+        from monitor_topo_rela
+        where host_ip_src = #{hostIp}
+    </select>
+
+    <select id="qrySetIdByHost" resultType="string">
+        select topo_set_id topo_set_id
+        from monitor_topo_info
+        where host_ip = #{hostIp}
+    </select>
+
+    <select id="qryMinSetId" resultType="string">
+        select topo_set_id minId from monitor_topo_info where create_time = ( select min(create_time) create_time
+        from monitor_topo_info
+        where host_ip in
+        <foreach collection="list" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>) limit 1
+    </select>
+</mapper>

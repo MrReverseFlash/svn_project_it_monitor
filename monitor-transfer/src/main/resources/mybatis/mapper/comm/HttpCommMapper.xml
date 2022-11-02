@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.envisioniot.uscada.monitor.transfer.mapper.comm.HttpCommMapper">
+    <select id="getMonitorObj" resultType="com.envisioniot.uscada.monitor.common.entity.HttpInfo">
+        select
+            method as method,
+            service_name as appName,
+            url as url,
+            body as body
+        from monitor_http_info where host_ip = #{host_ip}
+    </select>
+</mapper>

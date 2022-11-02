@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.envisioniot.uscada.monitor.web.mapper.fdb.write.HttpFWMapper">
+
+	<sql id="insHttpList">
+		host_ip,url,service_name,method,body,create_time,update_time
+	</sql>
+
+	<update id="updateById" parameterType="com.envisioniot.uscada.monitor.web.entity.HttpInfo">
+		UPDATE monitor_http_info
+		<set>
+			<if test="hostIp != null and hostIp != ''">
+				host_ip = #{hostIp},
+			</if>
+			<if test="url != null and url != ''">
+				url = #{url},
+			</if>
+			<if test="serviceName != null and serviceName != ''">
+				service_name = #{serviceName},
+			</if>
+			<if test="method != null and method != ''">
+				method = #{method},
+			</if>
+			<if test="body != null">
+				body = #{body},
+			</if>
+			update_time = datetime('now', 'localtime')
+		</set>
+		WHERE id = #{id}
+	</update>
+
+	<insert id="save" parameterType="com.envisioniot.uscada.monitor.web.entity.HttpInfo">
+		INSERT INTO monitor_http_info (<include refid="insHttpList" />)
+		values ( #{hostIp}, #{url}, #{serviceName}, #{method}, #{body}, datetime('now', 'localtime'), datetime('now', 'localtime'))
+	</insert>
+
+	<delete id="deleteByIds" parameterType="list">
+		delete from monitor_http_info where id IN
+		<foreach collection="list" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+</mapper>

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.envisioniot.uscada.monitor.web.mapper.comm.HostCommMapper">
+
+    <resultMap id="HostTable" type="com.envisioniot.uscada.monitor.web.entity.HostTable">
+        <result property="id" column="id"/>
+        <result property="hostIp" column="host_ip"/>
+        <result property="port" column="port"/>
+        <result property="hostName" column="host_name"/>
+        <result property="label" column="label"/>
+        <result property="status" column="status"/>
+        <result property="sysVersion" column="sys_version"/>
+        <result property="sysDetail" column="sys_detail"/>
+        <result property="cpuType" column="cpu_type"/>
+        <result property="cpuCoreNum" column="cpu_core_num"/>
+        <result property="cpuPer" column="cpu_per"/>
+        <result property="cpuTemperature" column="cpu_temperature"/>
+        <result property="memPer" column="mem_per"/>
+        <result property="totalMem" column="total_mem"/>
+        <result property="processNum" column="process_num"/>
+        <result property="zombieNum" column="zombie_num"/>
+        <result property="swapPer" column="swap_per"/>
+        <result property="swapTotal" column="swap_total"/>
+        <result property="netMaxPer" column="net_max_per"/>
+        <result property="totalBandWidth" column="total_bandwidth"/>
+        <result property="totalNetFlow" column="total_netflow"/>
+        <result property="netPer" column="net_per"/>
+        <result property="diskPer" column="disk_per"/>
+        <result property="diskUse" column="disk_use"/>
+        <result property="diskTotal" column="disk_total"/>
+        <result property="inodesPer" column="inodes_per"/>
+        <result property="startTime" column="start_time"/>
+        <result property="logUserNum" column="login_user_num"/>
+        <result property="runTime" column="run_time"/>
+        <result property="occurTime" column="occur_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="createTime" column="create_time"/>
+        <result property="type" column="type"/>
+        <result property="uscadaStatus" column="uscada_status"/>
+    </resultMap>
+
+    <select id="getTimeSeriesList" resultMap="HostTable">
+        select id id, host_ip host_ip, port port, host_name host_name, label label,
+                status status, sys_version sys_version, sys_detail sys_detail,
+                cpu_type cpu_type, cpu_core_num cpu_core_num, cpu_per cpu_per,
+                cpu_temperature cpu_temperature, mem_per mem_per, total_mem total_mem,
+                process_num process_num, zombie_num zombie_num, swap_per swap_per,
+                swap_total swap_total, net_max_per net_max_per, total_bandwidth total_bandwidth,
+                total_netflow total_netflow, net_per net_per, disk_per disk_per, disk_use disk_use,
+                disk_total disk_total, inodes_per inodes_per, start_time start_time,
+                login_user_num login_user_num, run_time run_time, occur_time occur_time,
+                update_time update_time, create_time create_time, type type, uscada_status uscada_status
+        from monitor_host_info
+    </select>
+
+    <select id="getInfo" resultMap="HostTable">
+        select id id, host_ip host_ip, port port, host_name host_name, label label,
+                status status, sys_version sys_version, sys_detail sys_detail,
+                cpu_type cpu_type, cpu_core_num cpu_core_num, cpu_per cpu_per,
+                cpu_temperature cpu_temperature, mem_per mem_per, total_mem total_mem,
+                process_num process_num, zombie_num zombie_num, swap_per swap_per,
+                swap_total swap_total, net_max_per net_max_per, total_bandwidth total_bandwidth,
+                total_netflow total_netflow, net_per net_per, disk_per disk_per, disk_use disk_use,
+                disk_total disk_total, inodes_per inodes_per, start_time start_time,
+                login_user_num login_user_num, run_time run_time, occur_time occur_time,
+                update_time update_time, create_time create_time, type type, uscada_status uscada_status
+        from monitor_host_info where host_ip = #{host_ip}
+    </select>
+
+    <select id="getHostProps" resultType="com.envisioniot.uscada.monitor.web.entity.HostPropResp">
+        select host_ip hostIp, port port, label label, type type
+        from monitor_host_info
+        where match_flag = #{match_flag}
+    </select>
+</mapper>

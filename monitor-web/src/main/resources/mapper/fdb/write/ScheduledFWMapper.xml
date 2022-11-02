@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.envisioniot.uscada.monitor.web.mapper.fdb.write.ScheduledFWMapper">
+
+	<update id="offlineHost" parameterType="list">
+		update monitor_host_info set status = 2, update_time = datetime('now', 'localtime')
+		where host_ip IN
+		<foreach collection="list" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</update>
+
+	<update id="insertHostAlarmBatch">
+		INSERT INTO monitor_host_alarm_his(host_ip, occur_time, alarm_type, alarm_content)
+		VALUES
+		<foreach collection="list" item="item" separator=",">
+			(#{item}, datetime('now', 'localtime'), #{alarmType}, #{alarmContent})
+		</foreach>
+	</update>
+
+	<update id="offlineApp" parameterType="list">
+		update monitor_app_info set status = 2, update_time = datetime('now', 'localtime')
+		where status = 1 and host_ip NOT IN
+		<foreach collection="list" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</update>
+
+	<update id="offlineDB" parameterType="list">
+		update monitor_db_info set status = 2, update_time = datetime('now', 'localtime')
+		where status = 1 and host_ip NOT IN
+		<foreach collection="list" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</update>
+
+	<update id="offlineDocker" parameterType="list">
+		update monitor_docker_info set status = 2, update_time = datetime('now', 'localtime')
+		where status = 1 and host_ip NOT IN
+		<foreach collection="list" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</update>
+
+</mapper>

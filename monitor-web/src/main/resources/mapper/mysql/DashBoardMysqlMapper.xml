@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.envisioniot.uscada.monitor.web.mapper.mysql.DashBoardMysqlMapper">
+
+	<resultMap id="HostTable" type="com.envisioniot.uscada.monitor.web.entity.HostTable">
+		<result property="hostIp" column="host_ip"/>
+		<result property="hostName" column="host_name"/>
+		<result property="label" column="label"/>
+		<result property="cpuPer" column="cpu_per"/>
+		<result property="cpuTemperature" column="cpu_temperature"/>
+		<result property="memPer" column="mem_per"/>
+		<result property="netPer" column="net_per"/>
+		<result property="diskPer" column="disk_per"/>
+		<result property="updateTime" column="update_time"/>
+	</resultMap>
+
+	<select id="qryCpuTmpTop10" resultMap="HostTable">
+		select host_ip host_ip, host_name host_name, label label, cpu_temperature cpu_temperature, update_time update_time
+		from monitor_host_info
+		where cpu_temperature is not null
+		and update_time &gt;= now() - INTERVAL 30 MINUTE
+		order by cpu_temperature desc
+		limit 10
+	</select>
+
+	<select id="qryCpuPerTop10" resultMap="HostTable">
+		select host_ip host_ip, host_name host_name, label label, cpu_per cpu_per, update_time update_time
+		from monitor_host_info
+		where cpu_per is not null
+		and update_time &gt;= now() - INTERVAL 30 MINUTE
+		order by cpu_per desc
+		limit 10
+	</select>
+
+	<select id="qryMemPerTop10" resultMap="HostTable">
+		select host_ip host_ip, host_name host_name, label label, mem_per mem_per, update_time update_time
+		from monitor_host_info
+		where mem_per is not null
+		and update_time &gt;= now() - INTERVAL 30 MINUTE
+		order by mem_per desc
+		limit 10
+	</select>
+
+	<select id="qryDiskPerTop10" resultMap="HostTable">
+		select host_ip host_ip, host_name host_name, label label, disk_per disk_per, update_time update_time
+		from monitor_host_info
+		where disk_per is not null
+		and update_time &gt;= now() - INTERVAL 30 MINUTE
+		order by disk_per desc
+		limit 10
+	</select>
+
+	<select id="qryNetPerTop10" resultMap="HostTable">
+		select host_ip host_ip, host_name host_name, label label, net_per net_per, update_time update_time
+		from monitor_host_info
+		where net_per is not null
+		and update_time &gt;= now() - INTERVAL 30 MINUTE
+		order by net_per desc
+		limit 10
+	</select>
+
+	<select id="getAllAlarm" resultType="com.envisioniot.uscada.monitor.web.entity.AlarmResponse">
+		select DATE_FORMAT(t1.occur_time, '%Y-%m-%d %H:%i:%s') occurTime,
+				concat(t2.db_tag, "[", t2.db_ip, ":", t2.db_port, "]") alarmObject,
+				t1.alarm_content alarmContent,
+				t1.alarm_type alarmType
+		from monitor_db_alarm_his t1 left join monitor_db_info t2 on t1.db_id = t2.id
+		where t1.occur_time &gt;= DATE_FORMAT(NOW(), '%Y-%m-%d 00:00:00')
+		UNION ALL
+		select DATE_FORMAT(t1.occur_time, '%Y-%m-%d %H:%i:%s') occurTime,
+				concat(t2.host_name, "[", t1.host_ip, "]") alarmObject,
+				t1.alarm_content alarmContent,
+				t1.alarm_type alarmType
+		from monitor_host_alarm_his t1 left join monitor_host_info t2 on t1.host_ip = t2.host_ip
+		where t1.occur_time &gt;= DATE_FORMAT(NOW(), '%Y-%m-%d 00:00:00')
+		ORDER BY occurTime desc
+    </select>
+</mapper>

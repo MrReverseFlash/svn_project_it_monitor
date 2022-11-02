@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.envisioniot.uscada.monitor.transfer.mapper.mysql.PortMysqlMapper">
+    <insert id="insertBatch">
+        INSERT IGNORE INTO monitor_port_info (host_ip,port,port_type,mark,create_time) VALUES
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{host_ip},#{item.portNum},#{item.portType},#{item.mark},now())
+        </foreach>
+    </insert>
+
+    <insert id="batchForUpdate">
+        <foreach collection="list" item="item" index="index" separator=";">
+            INSERT INTO monitor_port_info
+            (host_ip,port,mark,port_type,status,msg,listening_num,established_num,timewait_num,closewait_num,synsent_num,idle_num,occur_time,create_time)
+            VALUES (
+            #{host_ip},
+            #{item.portNum},
+            #{item.mark},
+            #{item.portType},
+            #{item.status},
+            #{item.msg},
+            #{item.listeningNum},
+            #{item.establishedNum},
+            #{item.timeWaitNum},
+            #{item.closeWaitNum},
+            #{item.synSentNum},
+            #{item.idleNum},
+            #{item.occurTime},
+            now())
+            ON DUPLICATE KEY UPDATE
+            status=#{item.status},
+            listening_num=#{item.listeningNum},
+            established_num=#{item.establishedNum},
+            timewait_num=#{item.timeWaitNum},
+            closewait_num=#{item.closeWaitNum},
+            synsent_num=#{item.synSentNum},
+            idle_num=#{item.idleNum},
+            msg=#{item.msg},
+            occur_time=#{item.occurTime},
+            update_time=now()
+        </foreach>
+    </insert>
+</mapper>

@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.envisioniot.uscada.monitor.web.mapper.comm.TopoCommMapper">
+
+	<resultMap id="topoInfoMap" type="com.envisioniot.uscada.monitor.web.entity.TopoInfo">
+		<result column="host_ip" property="hostIp" />
+		<result column="has_agent" property="hasAgent" />
+		<result column="x" property="x" />
+		<result column="y" property="y" />
+		<result column="create_time" property="createTime" />
+		<result column="update_time" property="updateTime" />
+		<result column="host_name" property="hostName" />
+		<result column="label" property="label" />
+		<result column="status" property="status" />
+		<result column="uscada_status" property="uscadaStatus" />
+		<result column="health_status" property="healthStatus" />
+		<result column="topo_level_id" property="topoLevelId" />
+		<result column="topo_level_num" property="topoLevelNum" />
+		<result column="topo_level_name" property="topoLevelName" />
+		<result column="topo_set_id" property="topoSetId" />
+		<result column="topo_set_num" property="topoSetNum" />
+		<result column="topo_set_name" property="topoSetName" />
+		<result column="topo_physic_id" property="topoPhysicId" />
+		<result column="topo_physic_num" property="topoPhysicNum" />
+		<result column="topo_physic_name" property="topoPhysicName" />
+	</resultMap>
+
+	<resultMap id="topoRelaMap" type="com.envisioniot.uscada.monitor.web.entity.TopoRela">
+		<result column="host_ip_target" property="hostIpTarget" />
+		<result column="status" property="status" />
+		<result column="operation_millis" property="operationMillis" />
+		<result column="is_default" property="isDefault" />
+		<result column="create_time" property="createTime" />
+		<result column="update_time" property="updateTime" />
+	</resultMap>
+
+	<resultMap id="gatewayMap" type="com.envisioniot.uscada.monitor.web.entity.GatewayInfo">
+		<result column="gateway_ip" property="gatewayIp" />
+		<result column="status" property="status" />
+		<result column="operation_millis" property="operationMillis" />
+		<result column="create_time" property="createTime" />
+		<result column="update_time" property="updateTime" />
+	</resultMap>
+
+	<resultMap id="topoParamMap" type="com.envisioniot.uscada.monitor.common.entity.TopoParam">
+		<id column="id" property="id" />
+		<result column="num" property="num" />
+		<result column="name" property="name" />
+		<result column="type" property="type" />
+	</resultMap>
+
+	<select id="qryTopoInfo" resultMap="topoInfoMap">
+		SELECT t1.host_ip host_ip,
+			   t1.has_agent has_agent,
+			   t1.x x,
+			   t1.y y,
+			   t1.update_time update_time,
+			   t1.create_time create_time,
+			   t2.host_name host_name,
+			   t2.label label,
+			   t2.status status,
+			   t2.uscada_status uscada_status,
+			   t2.health_status health_status,
+			   t1.topo_level_id topo_level_id,
+			   t3.num topo_level_num,
+			   t3.name topo_level_name,
+			   t1.topo_set_id topo_set_id,
+			   t4.num topo_set_num,
+			   t4.name topo_set_name,
+			   t1.topo_physic_id topo_physic_id,
+			   t5.num topo_physic_num,
+			   t5.name topo_physic_name
+		FROM monitor_topo_info t1
+		  LEFT JOIN monitor_host_info t2 ON t1.host_ip = t2.host_ip
+		  LEFT JOIN monitor_topo_param t3 ON t1.topo_level_id = t3.id
+		  LEFT JOIN monitor_topo_param t4 ON t1.topo_set_id = t4.id
+		  LEFT JOIN monitor_topo_param t5 ON t1.topo_physic_id = t5.id
+		ORDER BY t1.host_ip
+	</select>
+
+	<select id="qryGatewayByHost" resultMap="gatewayMap">
+		select gateway_ip gateway_ip, status status, operation_millis operation_millis, update_time update_time, create_time create_time
+		  from monitor_gateway_info
+		 where host_ip = #{hostIp}
+	</select>
+
+	<select id="qryTopoRelaByHost" resultMap="topoRelaMap">
+		select host_ip_target host_ip_target, status status, operation_millis operation_millis, is_default is_default, update_time update_time, create_time create_time
+		  from monitor_topo_rela
+		 where host_ip_src = #{hostIp}
+	</select>
+
+	<select id="qryTopoParamByType" resultMap="topoParamMap">
+		select id id, num num, name name
+		from monitor_topo_param
+		where type = #{type}
+		order by num
+	</select>
+
+	<select id="qryHostByParamId" resultType="string">
+		select host_ip host_ip from monitor_topo_info
+		where
+		<choose>
+			<when test="type == 1">
+				topo_level_id = #{id}
+			</when>
+			<when test="type == 2">
+				topo_set_id = #{id}
+			</when>
+			<when test="type == 3">
+				topo_physic_id = #{id}
+			</when>
+		</choose>
+		limit 1
+	</select>
+</mapper>

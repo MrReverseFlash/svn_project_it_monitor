@@ -1,0 +1,77 @@
+#自定义配置参数
+base:
+  serverIp: 127.0.0.1
+  # 测试配置，生产需要放开 TODO YK
+#  serverIp: 172.20.100.74
+  serverPort: 6527
+  # agent 与 server连接方式，目前支持http、file
+  transporter: http
+  #本机ip，如果配置非127.0.0.1，则使用
+  localIp: 127.0.0.1
+  # 测试配置，生产需要放开 TODO YK
+#  localIp: 172.24.32.246
+  # agent与server通讯方式HTTP还是穿网闸
+  isHttp: true
+  # http请求尝试次数
+  retryNum: 3
+  # 网卡连续采样时间间隔，毫秒
+  netInterval: 2000
+  # 磁盘连续采样时间间隔，毫秒
+  diskInterval: 2000
+  # 磁盘是否过来虚拟磁盘
+  filterVirtualDisk: true
+  # 磁盘是否过滤
+  filterOverlay: true
+  # 进程唯一性标识符，截取进程路径后续位数，默认200位
+  appUidLen: 200
+  # ied server端的type
+  serverCommType: [4,7,8,10,12,14]
+  # ied client端的type
+  clientCommType: [3,6,11,13,15]
+  # 需要被监控状态的SCADA地址(默认不监控，需要监控放开下一行注释)
+#  uscadaIpList: ["127.0.0.1"]
+task:
+  file: config/task/task.yml
+
+spring:
+  task:
+    concurSize: 10
+    takeTimeOutSecond: 10
+    sleepMilliSecond: 200
+    ######Thread scheduler Pool######
+    scheduling:
+      threadNamePrefix: agent-scheduler
+      pool:
+        size: 20
+  datasource:
+    driverClassName: com.mysql.jdbc.Driver
+    username: envision
+    # 数据库连接池配置 TODO 20220114 agent部署在宿主机，无法直连FDB
+    type: com.alibaba.druid.pool.DruidDataSource
+    initialSize: 5
+    minIdle: 5
+    maxActive: 10
+    maxWait: 10000
+    timeBetweenEvictionRunsMillis: 60000
+    minEvictableIdleTimeMillis: 300000
+    validationQuery: SELECT 1
+    testWhileIdle: true
+    testOnBorrow: false
+    testOnReturn: false
+    maxPoolPreparedStatementPerConnectionSize: 5
+  resources:
+    chain:
+      compressed: true
+
+server:
+  port: 6526
+  servlet:
+    context-path: /monitor-agent
+
+# Mybatis Config
+mybatis:
+  check-config-location: true
+  mapper-locations: classpath:mybatis-mapper/*.xml
+
+logging:
+  config: config/logback.xml

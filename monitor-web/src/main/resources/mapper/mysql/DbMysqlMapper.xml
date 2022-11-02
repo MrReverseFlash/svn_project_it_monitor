@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.envisioniot.uscada.monitor.web.mapper.mysql.DbMysqlMapper">
+
+	<resultMap id="dbMap" type="com.envisioniot.uscada.monitor.web.entity.DbInfo">
+		<id column="id" property="id"/>
+		<result column="db_name" property="dbName" />
+		<result column="db_type" property="dbType" />
+		<result column="db_user" property="user" />
+		<result column="db_passwd" property="passwd" />
+		<result column="db_ip" property="dbIp" />
+		<result column="db_port" property="dbPort" />
+		<result column="db_version" property="version" />
+		<result column="status" property="status" />
+		<result column="host_ip" property="hostIp" />
+		<result column="db_tag" property="dbTag" />
+		<result column="up_time" property="upTime" />
+		<result column="questions" property="questions" />
+		<result column="commit_num" property="commitNum" />
+		<result column="rollback_num" property="rollbackNum" />
+		<result column="conn_max" property="connMax" />
+		<result column="use_con" property="useCon" />
+		<result column="msg" property="msg" />
+		<result column="create_time" property="createTime" />
+		<result column="update_time" property="updateTime" />
+		<result column="host_status" property="hostStatus" />
+	</resultMap>
+
+
+	<resultMap id="tableMap" type="com.envisioniot.uscada.monitor.web.entity.TableInfo">
+		<id column="id" property="id"/>
+		<result column="table_name" property="tableName" />
+		<result column="description" property="description" />
+		<result column="exec_sql" property="execSql" />
+		<result column="record_num" property="recordNum" />
+		<result column="create_time" property="createTime" />
+		<result column="update_time" property="updateTime" />
+		<association property="dbInfo" resultMap="dbMap" javaType="com.envisioniot.uscada.monitor.web.entity.DbInfo" columnPrefix="dbinfo_" />
+	</resultMap>
+
+
+	<resultMap id="dbSampleReqMap" type="com.envisioniot.uscada.monitor.web.entity.DbSampleReq">
+		<result column="host_ip" property="hostIp" />
+		<result column="db_ip" property="dbIp" />
+		<result column="db_type" property="dbType" />
+		<result column="db_name" property="dbName" />
+	</resultMap>
+
+
+	<resultMap id="tableSampleReqMap" type="com.envisioniot.uscada.monitor.web.entity.TableSampleReq">
+		<result column="host_ip" property="hostIp" />
+		<result column="db_ip" property="dbIp" />
+		<result column="db_type" property="dbType" />
+		<result column="db_name" property="dbName" />
+		<result column="table_name" property="tableName" />
+	</resultMap>
+
+	<sql id="insDbList">
+		id, db_name, db_type, db_user, db_passwd, db_ip, db_port, db_version,
+		host_ip, db_tag, create_time, update_time
+	</sql>
+
+	<sql id="insTableList">
+		db_id, table_name, description, exec_sql, create_time, update_time
+	</sql>
+
+	<update id="updateById" parameterType="com.envisioniot.uscada.monitor.web.entity.DbInfo">
+		UPDATE monitor_db_info
+		<set>
+			<if test="dbName != null and dbName != ''">
+				db_name = #{dbName},
+			</if>
+			<if test="dbType != null and dbType != ''">
+				db_type = #{dbType},
+			</if>
+			<if test="user != null and user != ''">
+				db_user = #{user},
+			</if>
+			<if test="passwd != null and passwd != ''">
+				db_passwd = #{passwd},
+			</if>
+			<if test="dbIp != null and dbIp != ''">
+				db_ip = #{dbIp},
+			</if>
+			<if test="dbPort != null and dbPort != ''">
+				db_port = #{dbPort},
+			</if>
+			<if test="version != null and version != ''">
+				db_version = #{version},
+			</if>
+			<if test="hostIp != null and hostIp != ''">
+				host_ip = #{hostIp},
+			</if>
+			<if test="dbTag != null and dbTag != ''">
+				db_tag = #{dbTag},
+			</if>
+			update_time = now()
+		</set>
+		WHERE id = #{id}
+	</update>
+
+
+	<insert id="save" parameterType="com.envisioniot.uscada.monitor.web.entity.DbInfo">
+		INSERT INTO monitor_db_info (<include refid="insDbList" />)
+		values (#{id}, #{dbName}, #{dbType}, #{user}, #{passwd}, #{dbIp}, #{dbPort}, #{version}, #{hostIp}, #{dbTag}, now(), now() )
+	</insert>
+
+
+	<delete id="deleteByIds" parameterType="list">
+		delete from monitor_db_info where id IN
+		<foreach collection="list" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+
+	<insert id="saveTableInfo" parameterType="com.envisioniot.uscada.monitor.web.entity.SaveTableReq">
+		INSERT INTO monitor_table_info (<include refid="insTableList" />)
+		values ( #{dbId}, #{tableName}, #{description}, #{execSql}, now(), now() )
+	</insert>
+
+
+	<update id="updTableById" parameterType="com.envisioniot.uscada.monitor.web.entity.SaveTableReq">
+		update monitor_table_info set db_id = #{dbId}, table_name = #{tableName},
+									description = #{description}, exec_sql = #{execSql}, update_time = now()
+		where id = #{id}
+	</update>
+
+
+	<delete id="delTableByIds" parameterType="list">
+		delete from monitor_table_info where id IN
+		<foreach collection="list" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+
+
+	<delete id="delTableByDbIds" parameterType="list">
+		delete from monitor_table_info where db_id IN
+		<foreach collection="list" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+
+	<select id="getDbAlarm" resultType="com.envisioniot.uscada.monitor.web.entity.AlarmResponse">
+		select DATE_FORMAT(t1.occur_time, '%Y-%m-%d %H:%i:%s') occurTime,
+				concat(t2.db_tag, "[", t2.db_ip, ":", t2.db_port, "]") alarmObject,
+				t1.alarm_content alarmContent,
+				t1.alarm_type alarmType
+		from monitor_db_alarm_his t1 left join monitor_db_info t2 on t1.db_id = t2.id
+		where t1.db_id = #{dbId}
+		  and t1.occur_time &lt;= #{et}
+		  and t1.occur_time &gt;= #{st}
+		order by t1.db_id desc, t1.occur_time desc
+    </select>
+
+</mapper>

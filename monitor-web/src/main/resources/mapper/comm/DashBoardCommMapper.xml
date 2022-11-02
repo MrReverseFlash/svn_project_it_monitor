@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.envisioniot.uscada.monitor.web.mapper.comm.DashBoardCommMapper">
+
+	<select id="qryHostNum" resultType="int">
+		select count(1) num from monitor_host_info
+	</select>
+
+	<select id="qryDbNum" resultType="int">
+		select count(1) num from monitor_db_info
+	</select>
+
+	<select id="qryAppNum" resultType="int">
+		select count(1) num from monitor_app_info
+	</select>
+
+	<select id="qryPortNum" resultType="int">
+		select count(1) num from monitor_port_info
+	</select>
+
+	<select id="qryOnLineNum" resultType="int">
+		select count(1) num from monitor_host_info where status = 1
+	</select>
+
+	<select id="qryOffLineNum" resultType="int">
+		select count(1) num from monitor_host_info where status = 2
+	</select>
+
+	<select id="qryAllScadaStat" resultType="string">
+		select uscada_status uscadaStat from monitor_host_info
+	</select>
+
+</mapper>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.envisioniot.uscada.monitor.transfer.mapper.comm.PortCommMapper">
+    <select id="getMonitorObj" resultType="com.envisioniot.uscada.monitor.common.entity.PortInfo">
+        select port as portNum,port_type as portType,mark as mark from monitor_port_info where host_ip=#{host_ip}
+    </select>
+</mapper>

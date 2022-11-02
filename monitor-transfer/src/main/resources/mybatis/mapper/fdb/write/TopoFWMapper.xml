@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.envisioniot.uscada.monitor.transfer.mapper.fdb.write.TopoFWMapper">
+
+    <update id="insHost_update_first">
+        update monitor_topo_info
+        set update_time = (case when has_agent = 1 then update_time else datetime('now', 'localtime') end), has_agent = 1
+        where host_ip = #{hostIp}
+    </update>
+
+    <insert id="insHost_insert_iffail">
+        insert into monitor_topo_info
+        (host_ip, has_agent, update_time, create_time) values(#{hostIp}, 1, datetime('now', 'localtime'), datetime('now', 'localtime'))
+    </insert>
+
+    <insert id="insAssociatedHost">
+        insert or ignore into monitor_topo_info
+        (host_ip, update_time, create_time) values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.hostIpTarget}, datetime('now', 'localtime'), datetime('now', 'localtime'))
+        </foreach>
+    </insert>
+
+    <delete id="delNotExtDefRelaByHost">
+        delete from monitor_topo_rela
+        where host_ip_src = #{hostIp}
+          and is_default = 1
+          and host_ip_target not in
+          <foreach collection="list" item="item" separator="," open="(" close=")">
+              #{item.hostIpTarget}
+          </foreach>
+    </delete>
+
+    <insert id="insDefRelaByHost_update_first">
+        <foreach collection="list" item="item" separator=";">
+            update monitor_topo_rela
+            set is_default = 1, update_time = (case when is_default = 1 then update_time else datetime('now', 'localtime') end)
+            where host_ip_src = #{hostIp}
+              and host_ip_target = #{item.hostIpTarget}
+        </foreach>
+    </insert>
+
+    <insert id="insDefRelaByHost_insert_later">
+        insert or ignore into monitor_topo_rela
+        (host_ip_src, host_ip_target, is_default, update_time, create_time) values
+        <foreach collection="list" item="item" separator=",">
+            (#{hostIp}, #{item.hostIpTarget}, 1, datetime('now', 'localtime'), datetime('now', 'localtime'))
+        </foreach>
+    </insert>
+
+    <update id="updRelaList">
+        <foreach collection="list" item="item" separator=";">
+            update monitor_topo_rela
+            set status = #{item.status},
+                operation_millis = #{item.operationMillis},
+                update_time = datetime('now', 'localtime')
+            where host_ip_src = #{hostIp}
+              and host_ip_target = #{item.hostIpTarget}
+        </foreach>
+    </update>
+
+    <delete id="delNotExtGwByHost">
+        delete from monitor_gateway_info
+        where host_ip = #{hostIp}
+          and gateway_ip not in
+          <foreach collection="list" item="item" separator="," open="(" close=")">
+              #{item.gatewayIp}
+          </foreach>
+    </delete>
+
+    <insert id="insGwList">
+        insert or ignore into monitor_gateway_info
+        (host_ip, gateway_ip, update_time, create_time) values
+        <foreach collection="list" item="item" separator=",">
+            (#{hostIp}, #{item.gatewayIp}, datetime('now', 'localtime'), datetime('now', 'localtime'))
+        </foreach>
+    </insert>
+
+    <update id="updGwList">
+        <foreach collection="list" item="item" separator=";">
+            update monitor_gateway_info
+            set status = #{item.status},
+                operation_millis = #{item.operationMillis},
+                update_time = datetime('now', 'localtime')
+            where host_ip = #{hostIp}
+              and gateway_ip = #{item.gatewayIp}
+        </foreach>
+    </update>
+
+    <update id="updSetId">
+        update monitor_topo_info
+        set update_time = (case when topo_set_id = #{topoSetId} then update_time else datetime('now', 'localtime') end),
+            topo_set_id = #{topoSetId}
+        where host_ip in
+        <foreach collection="list" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </update>
+
+    <insert id="insTopoParam_insert_later">
+        insert into monitor_topo_param (id, num, name, type) values
+        (#{param.id}, #{param.num}, #{param.name}, #{param.type})
+    </insert>
+</mapper>

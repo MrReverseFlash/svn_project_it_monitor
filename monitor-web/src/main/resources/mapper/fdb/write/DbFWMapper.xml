@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.envisioniot.uscada.monitor.web.mapper.fdb.write.DbFWMapper">
+
+	<sql id="insDbList">
+		id, db_name, db_type, db_user, db_passwd, db_ip, db_port, db_version,
+		host_ip, db_tag, create_time, update_time
+	</sql>
+
+	<sql id="insTableList">
+		db_id, table_name, description, exec_sql, create_time, update_time
+	</sql>
+
+	<update id="updateById" parameterType="com.envisioniot.uscada.monitor.web.entity.DbInfo">
+		UPDATE monitor_db_info
+		<set>
+			<if test="dbName != null and dbName != ''">
+				db_name = #{dbName},
+			</if>
+			<if test="dbType != null and dbType != ''">
+				db_type = #{dbType},
+			</if>
+			<if test="user != null and user != ''">
+				db_user = #{user},
+			</if>
+			<if test="passwd != null and passwd != ''">
+				db_passwd = #{passwd},
+			</if>
+			<if test="dbIp != null and dbIp != ''">
+				db_ip = #{dbIp},
+			</if>
+			<if test="dbPort != null and dbPort != ''">
+				db_port = #{dbPort},
+			</if>
+			<if test="version != null and version != ''">
+				db_version = #{version},
+			</if>
+			<if test="hostIp != null and hostIp != ''">
+				host_ip = #{hostIp},
+			</if>
+			<if test="dbTag != null and dbTag != ''">
+				db_tag = #{dbTag},
+			</if>
+			update_time = datetime('now', 'localtime')
+		</set>
+		WHERE id = #{id}
+	</update>
+
+
+	<insert id="save" parameterType="com.envisioniot.uscada.monitor.web.entity.DbInfo">
+		INSERT INTO monitor_db_info (<include refid="insDbList" />)
+		values (#{id}, #{dbName}, #{dbType}, #{user}, #{passwd}, #{dbIp}, #{dbPort}, #{version}, #{hostIp}, #{dbTag}, datetime('now', 'localtime'), datetime('now', 'localtime'))
+	</insert>
+
+
+	<delete id="deleteByIds" parameterType="list">
+		delete from monitor_db_info where id IN
+		<foreach collection="list" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+
+	<insert id="saveTableInfo" parameterType="com.envisioniot.uscada.monitor.web.entity.SaveTableReq">
+		INSERT INTO monitor_table_info (<include refid="insTableList" />)
+		values ( #{dbId}, #{tableName}, #{description}, #{execSql}, datetime('now', 'localtime'), datetime('now', 'localtime'))
+	</insert>
+
+
+	<update id="updTableById" parameterType="com.envisioniot.uscada.monitor.web.entity.SaveTableReq">
+		update monitor_table_info set db_id = #{dbId}, table_name = #{tableName},
+									description = #{description}, exec_sql = #{execSql}, update_time = datetime('now', 'localtime')
+		where id = #{id}
+	</update>
+
+
+	<delete id="delTableByIds" parameterType="list">
+		delete from monitor_table_info where id IN
+		<foreach collection="list" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+
+
+	<delete id="delTableByDbIds" parameterType="list">
+		delete from monitor_table_info where db_id IN
+		<foreach collection="list" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+
+</mapper>

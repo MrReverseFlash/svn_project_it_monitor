@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.envisioniot.uscada.monitor.transfer.mapper.mysql.TopoMysqlMapper">
+    <insert id="insHost">
+        insert into monitor_topo_info
+        (host_ip, has_agent, update_time, create_time) value(#{hostIp}, 1, now(), now())
+        ON DUPLICATE KEY UPDATE
+        update_time = if(has_agent = 1, update_time, now()),
+        has_agent = 1
+    </insert>
+
+    <insert id="insAssociatedHost">
+        insert ignore into monitor_topo_info
+        (host_ip, update_time, create_time) values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.hostIpTarget}, now(), now())
+        </foreach>
+    </insert>
+
+    <delete id="delNotExtDefRelaByHost">
+        delete from monitor_topo_rela
+        where host_ip_src = #{hostIp}
+          and is_default = 1
+          and host_ip_target not in
+          <foreach collection="list" item="item" separator="," open="(" close=")">
+              #{item.hostIpTarget}
+          </foreach>
+    </delete>
+
+    <insert id="insDefRelaByHost">
+        insert into monitor_topo_rela
+        (host_ip_src, host_ip_target, is_default, update_time, create_time) values
+        <foreach collection="list" item="item" separator=",">
+            (#{hostIp}, #{item.hostIpTarget}, 1, now(), now())
+        </foreach>
+        ON DUPLICATE KEY UPDATE
+        is_default = 1,
+        update_time = if(is_default = 1, update_time, now())
+    </insert>
+
+    <update id="updRelaList">
+        <foreach collection="list" item="item" separator=";">
+            update monitor_topo_rela
+            set status = #{item.status},
+                operation_millis = #{item.operationMillis},
+                update_time = now()
+            where host_ip_src = #{hostIp}
+              and host_ip_target = #{item.hostIpTarget}
+        </foreach>
+    </update>
+
+    <delete id="delNotExtGwByHost">
+        delete from monitor_gateway_info
+        where host_ip = #{hostIp}
+          and gateway_ip not in
+          <foreach collection="list" item="item" separator="," open="(" close=")">
+              #{item.gatewayIp}
+          </foreach>
+    </delete>
+
+    <insert id="insGwList">
+        insert ignore into monitor_gateway_info
+        (host_ip, gateway_ip, update_time, create_time) values
+        <foreach collection="list" item="item" separator=",">
+            (#{hostIp}, #{item.gatewayIp}, now(), now())
+        </foreach>
+    </insert>
+
+    <update id="updGwList">
+        <foreach collection="list" item="item" separator=";">
+            update monitor_gateway_info
+            set status = #{item.status},
+                operation_millis = #{item.operationMillis},
+                update_time = now()
+            where host_ip = #{hostIp}
+              and gateway_ip = #{item.gatewayIp}
+        </foreach>
+    </update>
+
+    <update id="updSetId">
+        update monitor_topo_info
+        set update_time = if(topo_set_id = #{topoSetId}, update_time, now()),
+            topo_set_id = #{topoSetId}
+        where host_ip in
+        <foreach collection="list" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </update>
+
+    <insert id="insTopoParam" useGeneratedKeys="true" keyProperty="param.id">
+        insert into monitor_topo_param (id, num, name, type) value
+        (#{param.id}, #{param.num}, #{param.name}, #{param.type})
+    </insert>
+</mapper>

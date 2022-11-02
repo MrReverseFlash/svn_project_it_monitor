@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.envisioniot.uscada.monitor.web.mapper.comm.PortCommMapper">
+
+	<resultMap id="portMap" type="com.envisioniot.uscada.monitor.web.entity.PortInfo">
+		<id column="id" property="id"/>
+		<result column="host_ip" property="hostIp" />
+		<result column="port" property="port" />
+		<result column="mark" property="mark" />
+		<result column="port_type" property="portType" />
+		<result column="status" property="status" />
+		<result column="listening_num" property="listeningNum" />
+		<result column="established_num" property="establishedNum" />
+		<result column="timewait_num" property="timewaitNum" />
+		<result column="closewait_num" property="closewaitNum" />
+		<result column="synsent_num" property="synsentNum" />
+		<result column="idle_num" property="idleNum" />
+		<result column="msg" property="msg" />
+		<result column="create_time" property="createTime" />
+		<result column="update_time" property="updateTime" />
+		<result column="host_status" property="hostStatus" />
+	</resultMap>
+
+	<resultMap id="portSampleReqMap" type="com.envisioniot.uscada.monitor.web.entity.PortSampleReq">
+		<result column="host_ip" property="hostIp" />
+		<result column="port" property="port" />
+	</resultMap>
+
+	<sql id="qryPortList">
+		t1.id id, t1.host_ip host_ip, t1.port port, t1.mark mark, t1.port_type port_type, t1.status status, t1.listening_num listening_num, t1.established_num established_num,
+		t1.timewait_num timewait_num, t1.closewait_num closewait_num, t1.synsent_num synsent_num, t1.idle_num idle_num, t1.msg msg, t1.create_time create_time, t1.update_time update_time,
+		t2.status host_status
+	</sql>
+
+	<select id="qryAll" resultMap="portMap">
+		SELECT
+		<include refid="qryPortList" />
+		FROM monitor_port_info t1 left join monitor_host_info t2 on t1.host_ip = t2.host_ip
+		order by t1.host_ip
+	</select>
+
+	<select id="qryPortSampleReqByIds" parameterType="list" resultMap="portSampleReqMap">
+		select host_ip host_ip, port port from monitor_port_info where id in
+		<foreach collection="list" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</select>
+</mapper>

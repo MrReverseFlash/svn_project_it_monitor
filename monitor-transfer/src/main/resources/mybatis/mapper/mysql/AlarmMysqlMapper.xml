@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.envisioniot.uscada.monitor.transfer.mapper.mysql.AlarmMysqlMapper">
+
+    <insert id="insertHostAlarm">
+        INSERT INTO monitor_host_alarm_his(host_ip, occur_time, alarm_type, alarm_content)
+        VALUES(#{alarmHostInfo.hostIp}, #{alarmHostInfo.occurTime}, #{alarmHostInfo.alarmType}, #{alarmHostInfo.alarmContent})
+    </insert>
+    <insert id="insertDbAlarm">
+        INSERT INTO monitor_db_alarm_his(db_id, occur_time, alarm_type, alarm_content)
+        VALUES(#{alarmDbInfo.dbId}, #{alarmDbInfo.occurTime}, #{alarmDbInfo.alarmType}, #{alarmDbInfo.alarmContent})
+    </insert>
+
+
+</mapper>

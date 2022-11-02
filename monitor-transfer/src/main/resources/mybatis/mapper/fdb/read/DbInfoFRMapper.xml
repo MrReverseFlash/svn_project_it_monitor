@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.envisioniot.uscada.monitor.transfer.mapper.fdb.read.DbInfoFRMapper">
+
+    <select id="insert_getid_ifsuccess" resultType="java.lang.Long">
+        select id id
+        from monitor_db_info
+        where host_ip = #{host_ip}
+          and db_ip = #{db.dbIp}
+          and db_type = #{db.dbType}
+          and db_name = #{db.dbName}
+    </select>
+
+    <select id="qryDbAlarmObjById" resultType="string">
+		select t2.db_tag || "[" || t2.db_ip || ":" || t2.db_port || "]" dbAlarmObj
+		from monitor_db_info t2
+		where t2.id = #{dbId}
+    </select>
+</mapper>

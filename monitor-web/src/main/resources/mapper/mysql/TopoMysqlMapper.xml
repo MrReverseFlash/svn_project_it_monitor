@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.envisioniot.uscada.monitor.web.mapper.mysql.TopoMysqlMapper">
+
+	<insert id="insCustRelaByHost">
+        insert ignore into monitor_topo_rela
+        (host_ip_src, host_ip_target, is_default, update_time, create_time) values
+        (#{hostIpA}, #{hostIpB}, 0, now(), now()),
+        (#{hostIpB}, #{hostIpA}, 0, now(), now())
+    </insert>
+
+	<delete id="delCustRelaByHost">
+		delete from monitor_topo_rela
+		where is_default = 0
+		  and (
+		  		(
+		  			host_ip_src = #{hostIpA} and host_ip_target = #{hostIpB}
+		  		) or
+		  		(
+		  			host_ip_target = #{hostIpA} and host_ip_src = #{hostIpB}
+		  		)
+		  )
+	</delete>
+
+	<insert id="insTopoParam" useGeneratedKeys="true" keyProperty="param.id">
+        insert into monitor_topo_param (id, num, name, type) value
+        (#{param.id}, #{param.num}, #{param.name}, #{param.type})
+    </insert>
+
+	<update id="updTopoParam">
+		update monitor_topo_param
+		set
+			<if test="param.name != null">
+				name = #{param.name},
+			</if>
+			<if test="param.num != null">
+				num = #{param.num},
+			</if>
+			type = type
+		where id = #{param.id}
+	</update>
+
+	<update id="updHostParamId">
+		update monitor_topo_info
+		set
+		<choose>
+			<when test="type == 1">
+				update_time = if(topo_level_id = #{id}, update_time, now()),
+				topo_level_id = #{id}
+			</when>
+			<when test="type == 2">
+				update_time = if(topo_set_id = #{id}, update_time, now()),
+				topo_set_id = #{id}
+			</when>
+			<when test="type == 3">
+				update_time = if(topo_physic_id = #{id}, update_time, now()),
+				topo_physic_id = #{id}
+			</when>
+		</choose>
+		where host_ip in
+		<foreach collection="list" item="item" open="(" close=")" separator=",">
+			#{item}
+		</foreach>
+	</update>
+
+	<update id="updHostCoordinate">
+		<foreach collection="list" item="item" separator=";">
+			update monitor_topo_info
+			set update_time = if(x = #{item.x} and y = #{item.y}, update_time, now()),
+				x = #{item.x}, y = #{item.y}
+			where host_ip = #{item.hostIp}
+		</foreach>
+	</update>
+
+	<update id="delHostParamId">
+		update monitor_topo_info
+		set
+		<choose>
+			<when test="type == 1">
+				update_time = if(topo_level_id is null, update_time, now()),
+				topo_level_id = null
+			</when>
+			<when test="type == 2">
+				update_time = if(topo_set_id is null, update_time, now()),
+				topo_set_id = null
+			</when>
+			<when test="type == 3">
+				update_time = if(topo_physic_id is null, update_time, now()),
+				topo_physic_id = null
+			</when>
+		</choose>
+		where host_ip in
+		<foreach collection="list" item="item" open="(" close=")" separator=",">
+			#{item}
+		</foreach>
+	</update>
+
+	<delete id="delTopoParam">
+		delete from monitor_topo_param
+		where id = #{id}
+	</delete>
+</mapper>

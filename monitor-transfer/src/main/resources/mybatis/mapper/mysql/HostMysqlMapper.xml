@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.envisioniot.uscada.monitor.transfer.mapper.mysql.HostMysqlMapper">
+
+    <insert id="update">
+        INSERT INTO monitor_host_info
+        (host_ip,port,host_name,status,sys_version,sys_detail,cpu_type,cpu_core_num,cpu_per,mem_per,total_mem,start_time,login_user_num,run_time,create_time,type,
+        swap_per,
+        swap_total,
+        total_bandwidth,
+        total_netflow,
+        net_max_per,
+        net_per,
+        disk_per,
+        disk_use,
+        disk_total,
+        inodes_per,
+        process_num,
+        zombie_num,
+        occur_time,
+        match_flag,
+        uscada_status
+        )
+        VALUES (
+        #{host.hostIp},
+        #{host.port},
+        #{host.hostName},
+        #{host.status},
+        #{host.systemInfo.version},
+        #{host.systemInfo.detail},
+        #{host.systemInfo.cpuVersion},
+        #{host.systemInfo.cpuCoreNum},
+        #{host.cpuSample.user}+#{host.cpuSample.system},
+        #{host.memSample.usePer},
+        #{host.memSample.total},
+        #{host.startTime},
+        #{host.logUserNum},
+        #{host.runTime},
+        now(),
+        #{host.type},
+        #{host.swapSample.swapPer},
+        #{host.swapSample.swapTotal},
+        #{host.netTotal.totalBandWidth},
+        #{host.netTotal.totalNetFlow},
+        #{host.netTotal.netMaxPer},
+        #{host.netTotal.netPer},
+        #{host.diskTotal.diskPer},
+        #{host.diskTotal.diskUse},
+        #{host.diskTotal.diskTotal},
+        #{host.diskTotal.inodesPer},
+        #{host.systemInfo.processNum},
+        #{host.systemInfo.zombieNum},
+        #{host.occurTime},
+        #{host.matchFlag},
+        <choose>
+            <when test="host.uscadaStatList != null and host.uscadaStatList.size > 0">
+                <foreach collection="host.uscadaStatList" item="uscadaStat" separator=",';'," open="concat(" close=")">
+                    '${uscadaStat.ip}:${uscadaStat.status}'
+                </foreach>
+            </when>
+            <otherwise>
+                null
+            </otherwise>
+        </choose>
+        )
+        ON DUPLICATE KEY UPDATE
+        port=#{host.port},
+        host_name=#{host.hostName},
+        status=#{host.status},
+        sys_version=#{host.systemInfo.version},
+        sys_detail=#{host.systemInfo.detail},
+        cpu_type=#{host.systemInfo.cpuVersion},
+        cpu_core_num=#{host.systemInfo.cpuCoreNum},
+        cpu_per=#{host.cpuSample.user}+#{host.cpuSample.system},
+        mem_per=#{host.memSample.usePer},
+        total_mem=#{host.memSample.total},
+        start_time=#{host.startTime},
+        login_user_num=#{host.logUserNum},
+        run_time=#{host.runTime},
+        update_time=now(),
+        type=#{host.type},
+        swap_per=#{host.swapSample.swapPer},
+        swap_total=#{host.swapSample.swapTotal},
+        total_bandwidth=#{host.netTotal.totalBandWidth},
+        total_netflow=#{host.netTotal.totalNetFlow},
+        net_max_per=#{host.netTotal.netMaxPer},
+        net_per=#{host.netTotal.netPer},
+        disk_per=#{host.diskTotal.diskPer},
+        disk_use=#{host.diskTotal.diskUse},
+        disk_total=#{host.diskTotal.diskTotal},
+        inodes_per=#{host.diskTotal.inodesPer},
+        process_num=#{host.systemInfo.processNum},
+        zombie_num=#{host.systemInfo.zombieNum},
+        occur_time=#{host.occurTime},
+        match_flag= #{host.matchFlag},
+        uscada_status=
+        <choose>
+            <when test="host.uscadaStatList != null and host.uscadaStatList.size > 0">
+                <foreach collection="host.uscadaStatList" item="uscadaStat" separator=",';'," open="concat(" close=")">
+                    '${uscadaStat.ip}:${uscadaStat.status}'
+                </foreach>
+            </when>
+            <otherwise>
+                null
+            </otherwise>
+        </choose>
+    </insert>
+
+    <update id="offlineHost" parameterType="list">
+        update monitor_host_info set status = 2, update_time = now()
+        where host_ip IN
+        <foreach collection="list" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <update id="insertHostAlarmBatch">
+        INSERT INTO monitor_host_alarm_his(host_ip, occur_time, alarm_type, alarm_content)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item}, now(), #{alarmType}, #{alarmContent})
+        </foreach>
+    </update>
+
+    <select id="qryHostAlarmObj" resultType="string">
+        select concat(t2.host_name, "[", t2.host_ip, "]") hostAlarmObj
+        from monitor_host_info t2
+        where t2.host_ip in
+        <foreach collection="hostIpList" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </select>
+</mapper>

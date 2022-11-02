@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.envisioniot.uscada.monitor.transfer.mapper.mysql.DbTableMysqlMapper">
+    <insert id="insertBatch">
+        INSERT IGNORE INTO monitor_table_info (db_id,table_name,exec_sql,create_time) VALUES
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{db_id},#{item.tableName},#{item.sql},now())
+        </foreach>
+    </insert>
+
+    <insert id="batchForUpdate">
+        <foreach collection="list" item="item" index="index" separator=";">
+            INSERT INTO monitor_table_info
+            (db_id,table_name,exec_sql,create_time,record_num)
+            VALUES (#{db_id},#{item.tableName},#{item.sql},now(),#{item.num})
+            ON DUPLICATE KEY UPDATE
+            update_time=now(),
+            record_num=#{item.num}
+        </foreach>
+    </insert>
+</mapper>

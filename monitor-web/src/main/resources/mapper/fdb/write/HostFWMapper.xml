@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.envisioniot.uscada.monitor.web.mapper.fdb.write.HostFWMapper">
+
+    <update id="modifyLabel">
+        update monitor_host_info set label = #{label} where id=#{id}
+    </update>
+    <delete id="delHost">
+        delete  from monitor_host_info where id=#{id}
+    </delete>
+
+</mapper>

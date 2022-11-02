@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.envisioniot.uscada.monitor.web.mapper.comm.HttpCommMapper">
+
+	<resultMap id="httpMap" type="com.envisioniot.uscada.monitor.web.entity.HttpInfo">
+		<id column="id" property="id"/>
+		<result column="host_ip" property="hostIp" />
+		<result column="url" property="url" />
+		<result column="service_name" property="serviceName" />
+		<result column="method" property="method" />
+		<result column="body" property="body" />
+		<result column="status" property="status" />
+		<result column="response_code" property="responseCode" />
+		<result column="response_time" property="responseTime" />
+		<result column="msg" property="msg" />
+		<result column="create_time" property="createTime" />
+		<result column="update_time" property="updateTime" />
+		<result column="host_status" property="hostStatus" />
+	</resultMap>
+
+	<resultMap id="httpSampleReqMap" type="com.envisioniot.uscada.monitor.web.entity.HttpSampleReq">
+		<result column="host_ip" property="hostIp" />
+		<result column="url" property="url" />
+	</resultMap>
+
+	<sql id="qryHttpList">
+		t1.id id, t1.host_ip host_ip, t1.url url, t1.service_name service_name, t1.method method, t1.body body, t1.status status, t1.response_code response_code,
+		t1.response_time response_time, t1.msg msg, t1.create_time create_time, t1.update_time update_time, t2.status host_status
+	</sql>
+
+	<select id="qryAll" resultMap="httpMap">
+		SELECT
+		<include refid="qryHttpList" />
+		FROM monitor_http_info t1 left join monitor_host_info t2 on t1.host_ip = t2.host_ip
+		order by t1.host_ip
+	</select>
+
+	<select id="qryHttpSampleReqByIds" parameterType="list" resultMap="httpSampleReqMap">
+		select host_ip host_ip, url url from monitor_http_info where id in
+		<foreach collection="list" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</select>
+</mapper>

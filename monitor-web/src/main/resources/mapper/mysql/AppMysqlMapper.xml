@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.envisioniot.uscada.monitor.web.mapper.mysql.AppMysqlMapper">
+
+    <insert id="addMonitorApp">
+        INSERT INTO monitor_app_info (host_ip,app_uid,app_pid,app_name,create_time,container_name) VALUES
+        (#{host_ip},#{app_uid},#{app_pid},#{app_name},now(),#{container_name})
+    </insert>
+
+    <update id="modifyName">
+        update monitor_app_info set app_name = #{app_name} where id=#{id}
+    </update>
+
+    <delete id="deleteApp">
+        delete from monitor_app_info where id=#{id}
+    </delete>
+</mapper>

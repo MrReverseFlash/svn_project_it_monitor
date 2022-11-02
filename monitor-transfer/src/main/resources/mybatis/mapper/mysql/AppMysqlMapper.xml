@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.envisioniot.uscada.monitor.transfer.mapper.mysql.AppMysqlMapper">
+
+    <insert id="insert">
+        INSERT IGNORE INTO monitor_app_info (host_ip,app_pid,app_uid,app_name,create_time) VALUES
+        <foreach collection="app_list" item="item" index="index" separator=",">
+            (#{host_ip},#{item.appPid},#{item.appUid},#{item.appName},now())
+        </foreach>
+    </insert>
+
+    <insert id="update">
+        INSERT INTO monitor_app_info (host_ip, app_pid, app_uid, app_name, status, start_time, mem_per, mem_use, cpu_per, io_read, io_write, occur_time, update_time, create_time, thread_num)
+        VALUES (#{host_ip}, #{item.appPid}, #{item.appUid}, #{item.appName}, #{item.status}, #{item.startTime}, #{item.memPer}, #{item.memUse}, #{item.cpuPer}, #{item.diskIoRead}, #{item.diskIoWritten}, #{item.occurTime}, now(), now(),#{item.threadNum})
+        ON DUPLICATE KEY UPDATE
+        app_pid = #{item.appPid},
+        status = #{item.status},
+        start_time = #{item.startTime},
+        mem_per = #{item.memPer},
+        mem_use = #{item.memUse},
+        cpu_per = #{item.cpuPer},
+        io_read = #{item.diskIoRead},
+        io_write = #{item.diskIoWritten},
+        occur_time = #{item.occurTime},
+        update_time = now(),
+        thread_num = #{item.threadNum}
+    </insert>
+
+    <update id="updateBatch" parameterType="java.util.List">
+        <foreach collection="list" item="item" index="index" separator=";">
+            UPDATE monitor_app_info
+            <set>
+                app_pid = #{item.appPid},
+                status = #{item.status},
+                start_time = #{item.startTime},
+                mem_per = #{item.memPer},
+                mem_use = #{item.memUse},
+                cpu_per = #{item.cpuPer},
+                io_read = #{item.diskIoRead},
+                io_write = #{item.diskIoWritten},
+                occur_time = #{item.occurTime},
+                update_time = now(),
+                msg = #{item.msg}
+            </set>
+            WHERE host_ip = #{host_ip} and app_uid = #{item.appUid}
+        </foreach>
+    </update>
+
+    <insert id="batchForUpdate">
+        <foreach collection="list" item="item" index="index" separator=";">
+            INSERT INTO monitor_app_info (host_ip, app_pid, app_uid, app_name, status, start_time, mem_per, mem_use, cpu_per, io_read, io_write, msg, occur_time, thread_num, create_time)
+            VALUES (
+            #{host_ip},
+            #{item.appPid},
+            #{item.appUid},
+            #{item.appName},
+            #{item.status},
+            #{item.startTime},
+            #{item.memPer},
+            #{item.memUse},
+            #{item.cpuPer},
+            #{item.diskIoRead},
+            #{item.diskIoWritten},
+            #{item.msg},
+            #{item.occurTime},
+            #{item.threadNum},
+            now())
+            ON DUPLICATE KEY UPDATE
+            app_pid = #{item.appPid},
+            status = #{item.status},
+            start_time = #{item.startTime},
+            mem_per = #{item.memPer},
+            mem_use = #{item.memUse},
+            cpu_per = #{item.cpuPer},
+            io_read = #{item.diskIoRead},
+            io_write = #{item.diskIoWritten},
+            msg = #{item.msg},
+            occur_time = #{item.occurTime},
+            thread_num = #{item.threadNum},
+            update_time = now()
+        </foreach>
+    </insert>
+</mapper>

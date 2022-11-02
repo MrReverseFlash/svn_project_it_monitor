@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.envisioniot.uscada.monitor.transfer.mapper.mysql.DbInfoMysqlMapper">
+    <insert id="insertBatch">
+        INSERT IGNORE INTO monitor_db_info (id,host_ip,db_ip,db_type,db_name,db_user,db_passwd,db_port,create_time,db_version,status) VALUES
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.id},#{host_ip},#{item.dbIp},#{item.dbType},#{item.dbName},#{item.user},#{item.passwd},#{item.dbPort},now(),#{item.version},#{item.status})
+        </foreach>
+    </insert>
+
+    <insert id="batchForUpdate">
+        <foreach collection="list" item="item" index="index" separator=";">
+            INSERT INTO monitor_db_info
+            (id,host_ip,db_ip,db_type,db_name,db_user,db_passwd,db_port,status,db_version,questions,commit_num,rollback_num,conn_max,use_con,msg,occur_time,create_time,up_time)
+            VALUES (
+            #{item.id},
+            #{host_ip},
+            #{item.dbIp},
+            #{item.dbType},
+            #{item.dbName},
+            #{item.user},
+            #{item.passwd},
+            #{item.dbPort},
+            #{item.status},
+            #{item.version},
+            #{item.questions},
+            #{item.commitNum},
+            #{item.rollbackNum},
+            #{item.connMax},
+            #{item.useCon},
+            #{item.msg},
+            #{item.occurTime},
+            now(),
+            #{item.upTime}
+            )
+            ON DUPLICATE KEY UPDATE
+            status=#{item.status},
+            questions=#{item.questions},
+            commit_num=#{item.commitNum},
+            rollback_num=#{item.rollbackNum},
+            conn_max=#{item.connMax},
+            use_con=#{item.useCon},
+            msg=#{item.msg},
+            occur_time=#{item.occurTime},
+            update_time=now(),
+            up_time=#{item.upTime},
+            db_version=#{item.version}
+        </foreach>
+    </insert>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="db.id">
+        INSERT IGNORE INTO monitor_db_info (id,host_ip,db_ip,db_type,db_name,db_user,db_passwd,db_port,create_time) VALUES
+        (#{db.id},#{host_ip},#{db.dbIp},#{db.dbType},#{db.dbName},#{db.user},#{db.passwd},#{db.dbPort},now())
+    </insert>
+
+    <select id="qryDbAlarmObjById" resultType="string">
+		select concat(t2.db_tag, "[", t2.db_ip, ":", t2.db_port, "]") dbAlarmObj
+		from monitor_db_info t2
+		where t2.id = #{dbId}
+    </select>
+    <select id="selectIdByInfo" resultType="java.lang.String">
+        select id from monitor_db_info where host_ip = #{host_ip} and db_ip = #{db.dbIp} and
+                                             db_type = #{db.dbType} and db_name = #{db.dbName}
+    </select>
+</mapper>

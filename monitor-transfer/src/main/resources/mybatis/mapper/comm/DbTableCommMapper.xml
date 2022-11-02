@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.envisioniot.uscada.monitor.transfer.mapper.comm.DbTableCommMapper">
+
+    <select id="getMonitorTable" resultType="com.envisioniot.uscada.monitor.common.entity.TableInfo">
+        select
+            table_name as tableName,
+            exec_sql as 'sql'
+        from monitor_table_info where db_id = #{db_id}
+    </select>
+</mapper>

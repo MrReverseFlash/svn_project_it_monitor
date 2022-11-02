@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.envisioniot.uscada.monitor.web.mapper.fdb.read.ScheduledFRMapper">
+
+	<select id="qryNeedOfflineHost" resultType="string">
+		select host_ip host_ip from monitor_host_info
+		where status = 1 and update_time &lt;= datetime('now','localtime','-5 minutes')
+	</select>
+
+	<select id="qryHostAlarmObj" resultType="string">
+		select t2.host_name || "[" || t2.host_ip || "]" hostAlarmObj
+		from monitor_host_info t2
+		where t2.host_ip in
+		<foreach collection="hostIpList" item="item" separator="," open="(" close=")">
+			#{item}
+		</foreach>
+	</select>
+</mapper>

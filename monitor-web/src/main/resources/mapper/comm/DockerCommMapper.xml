@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.envisioniot.uscada.monitor.web.mapper.comm.DockerCommMapper">
+
+	<resultMap id="dockerMap" type="com.envisioniot.uscada.monitor.web.entity.DockerInfo">
+		<id column="id" property="id"/>
+		<result column="host_ip" property="hostIp" />
+		<result column="container_id" property="containerId" />
+		<result column="container_name" property="containerName" />
+		<result column="status" property="status" />
+		<result column="uptime" property="uptime" />
+		<result column="container_create_time" property="containerCreateTime" />
+		<result column="mem_per" property="memPer" />
+		<result column="cpu_per" property="cpuPer" />
+		<result column="net_io_send" property="netIoSend" />
+		<result column="net_io_receive" property="netIoReceive" />
+		<result column="block_io_read" property="blockIoRead" />
+		<result column="block_io_write" property="blockIoWrite" />
+		<result column="pids" property="pids" />
+		<result column="msg" property="msg" />
+		<result column="image" property="image" />
+		<result column="create_time" property="createTime" />
+		<result column="update_time" property="updateTime" />
+		<result column="host_status" property="hostStatus" />
+	</resultMap>
+
+
+	<sql id="qryDockerList">
+		t1.id id, t1.host_ip host_ip, t1.container_id container_id, t1.container_name container_name, t1.status status, t1.uptime uptime, t1.container_create_time container_create_time,
+		t1.mem_per mem_per, t1.cpu_per cpu_per, t1.net_io_send net_io_send, t1.net_io_receive net_io_receive, t1.block_io_read block_io_read, t1.block_io_write block_io_write, t1.pids pids,
+		t1.msg msg, t1.image image, t1.create_time create_time, t1.update_time update_time, t2.status host_status
+	</sql>
+
+
+	<select id="qryAll" resultMap="dockerMap">
+		SELECT
+		<include refid="qryDockerList" />
+		FROM monitor_docker_info t1 left join monitor_host_info t2 on t1.host_ip = t2.host_ip
+		order by t1.host_ip
+	</select>
+
+    <select id="query" resultMap="dockerMap">
+        SELECT
+        	container_name container_name, status status
+        FROM monitor_docker_info where host_ip=#{host_ip}
+    </select>
+</mapper>

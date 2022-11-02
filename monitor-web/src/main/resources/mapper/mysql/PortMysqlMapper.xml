@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.envisioniot.uscada.monitor.web.mapper.mysql.PortMysqlMapper">
+
+	<sql id="insPortList">
+		host_ip,port,mark,port_type,create_time,update_time
+	</sql>
+
+	<update id="updateById" parameterType="com.envisioniot.uscada.monitor.web.entity.PortInfo">
+		UPDATE monitor_port_info
+		<set>
+			<if test="hostIp != null and hostIp != ''">
+				host_ip = #{hostIp},
+			</if>
+			<if test="port != null and port != ''">
+				port = #{port},
+			</if>
+			<if test="mark != null and mark != ''">
+				mark = #{mark},
+			</if>
+			<if test="portType != null and portType != ''">
+				port_type = #{portType},
+			</if>
+			update_time = now()
+		</set>
+		WHERE id = #{id}
+	</update>
+
+	<insert id="save" parameterType="com.envisioniot.uscada.monitor.web.entity.PortInfo">
+		INSERT INTO monitor_port_info (<include refid="insPortList" />)
+		values ( #{hostIp}, #{port}, #{mark}, #{portType}, now(), now() )
+	</insert>
+
+	<delete id="deleteByIds" parameterType="list">
+		delete from monitor_port_info where id IN
+		<foreach collection="list" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+</mapper>

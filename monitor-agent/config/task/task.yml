@@ -1,0 +1,36 @@
+host:
+  cron: 0 */1 * * * ?
+  run: true
+  name: 主机资源监控
+app:
+  cron: 6 */3 * * * ?
+  run: true
+  name: app 监控
+db:
+  cron: 12 */1 * * * ?
+  run: true
+  name: 数据源监控
+table:
+  cron: 18 */3 * * * ?
+  run: true
+  name: 表数据监控
+docker:
+  cron: 24 */3 * * * ?
+  run: true
+  name: docker容器监控
+http:
+  cron: 30 */3 * * * ?
+  run: true
+  name: url监控
+ied:
+  cron: 36 */1 * * * ?
+  run: true
+  name: ied监控
+port:
+  cron: 42 */1 * * * ?
+  run: true
+  name: 端口监控
+topo:
+  cron: 48 */1 * * * ?
+  run: true
+  name: 拓扑单元

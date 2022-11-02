@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.envisioniot.uscada.monitor.transfer.mapper.fdb.write.PortFWMapper">
+    <insert id="insertBatch">
+        INSERT OR IGNORE INTO monitor_port_info (host_ip,port,port_type,mark,create_time) VALUES
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{host_ip},#{item.portNum},#{item.portType},#{item.mark},datetime('now', 'localtime'))
+        </foreach>
+    </insert>
+
+    <update id="batchForUpdate_update_first">
+        <foreach collection="list" item="item" index="index" separator=";">
+            UPDATE monitor_port_info SET
+                status=#{item.status},
+                listening_num=#{item.listeningNum},
+                established_num=#{item.establishedNum},
+                timewait_num=#{item.timeWaitNum},
+                closewait_num=#{item.closeWaitNum},
+                synsent_num=#{item.synSentNum},
+                idle_num=#{item.idleNum},
+                msg=#{item.msg},
+                occur_time=#{item.occurTime},
+                update_time=datetime('now', 'localtime')
+            WHERE host_ip = #{host_ip}
+              AND port = #{item.portNum}
+        </foreach>
+    </update>
+
+    <insert id="batchForUpdate_insert_later">
+        <foreach collection="list" item="item" index="index" separator=";">
+            INSERT OR IGNORE INTO monitor_port_info
+            (host_ip,port,mark,port_type,status,msg,listening_num,established_num,timewait_num,closewait_num,synsent_num,idle_num,occur_time,create_time)
+            VALUES (
+            #{host_ip},
+            #{item.portNum},
+            #{item.mark},
+            #{item.portType},
+            #{item.status},
+            #{item.msg},
+            #{item.listeningNum},
+            #{item.establishedNum},
+            #{item.timeWaitNum},
+            #{item.closeWaitNum},
+            #{item.synSentNum},
+            #{item.idleNum},
+            #{item.occurTime},
+            datetime('now', 'localtime'))
+        </foreach>
+    </insert>
+</mapper>

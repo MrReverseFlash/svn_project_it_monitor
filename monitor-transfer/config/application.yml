@@ -1,0 +1,62 @@
+server:
+  port: 6527
+  servlet:
+    context-path: /monitor-transfer
+#日志文件输出路径
+logging:
+  config: config/logback.xml
+#  level:
+#    com.envisioniot.uscada.monitor.transfer.mapper: DEBUG
+
+# 数据库 相关设置
+spring:
+  # influx db info
+  influx:
+    # 0表示NONE, 1表示BASIC, 2表示HEADERS，3表示FULL
+    logLevel: 0
+    url: http://127.0.0.1:7086
+    # 测试配置，生产需要放开 TODO YK
+#    url: http://172.16.33.235:7086
+    user: pro_envision
+    password: pro_envision
+    database: pro_envision
+  datasource:
+    # 数据库连接池配置
+    type: com.alibaba.druid.pool.DruidDataSource
+
+#告警配置模板
+alarm:
+  #CPU告警，如果不想要该告警，可以不配置。下面配置表示连续5分钟采样平均大于70%则产生告警
+  cpu:
+    #采样平均连续多久产生告警（单位：分钟，整型，取值范围：1~1440）
+    sampleDuration: 5
+    #产生告警阈值（单位：%，浮点型，取值范围：0~100）
+    alarmThreshold: 70
+    #中断后多久可以产生新告警（单位：分钟，整型，取值范围：0~1440。可以不配置，默认为2，即上一次告警隔了2分钟才能产生新告警，最好比采样间隔大1）
+    alarmInterval: 2
+    #告警内容（不能为空，最多1024个字符）
+    alarmContent: "CPU异常，使用率连续5分钟平均值>70%"
+  #内存告警
+  mem:
+    sampleDuration: 5
+    alarmThreshold: 70
+    alarmContent: "内存不足，使用率连续5分钟平均值>70%"
+  #硬盘告警
+  disk:
+    sampleDuration: 5
+    alarmThreshold: 80
+    alarmContent: "硬盘不足，分区：arg1 使用率连续5分钟平均值>80%"
+  #主机告警
+  host:
+    sampleDuration: 10
+    alarmThreshold: 5
+    alarmContent: "主机离线"
+    matchFlag: "localhost"
+#向SCADA推送告警的目标地址
+uscadaIp: 127.0.0.1
+
+#关闭主机健康检查配置（默认为开）
+uscada:
+  monitor:
+    transfer:
+      hostHealthCheck: true

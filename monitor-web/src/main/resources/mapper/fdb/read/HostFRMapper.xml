@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.envisioniot.uscada.monitor.web.mapper.fdb.read.HostFRMapper">
+
+    <select id="getHostAlarm" resultType="com.envisioniot.uscada.monitor.web.entity.AlarmResponse">
+        select t1.occur_time occurTime,
+                t2.host_name || "[" || t1.host_ip || "]" alarmObject,
+                t1.alarm_content alarmContent,
+                t1.alarm_type alarmType
+        from monitor_host_alarm_his t1 left join monitor_host_info t2 on t1.host_ip = t2.host_ip
+        where t1.host_ip = #{hostIp}
+          and t1.occur_time &lt;= #{et}
+          and t1.occur_time &gt;= #{st}
+        order by t1.host_ip desc, t1.occur_time desc
+    </select>
+</mapper>
