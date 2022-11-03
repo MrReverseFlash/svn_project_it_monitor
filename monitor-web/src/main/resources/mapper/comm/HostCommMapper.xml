@@ -37,6 +37,7 @@
         <result property="createTime" column="create_time"/>
         <result property="type" column="type"/>
         <result property="uscadaStatus" column="uscada_status"/>
+        <result property="matchFlag" column="match_flag"/>
     </resultMap>
 
     <select id="getTimeSeriesList" resultMap="HostTable">
@@ -49,7 +50,8 @@
                 total_netflow total_netflow, net_per net_per, disk_per disk_per, disk_use disk_use,
                 disk_total disk_total, inodes_per inodes_per, start_time start_time,
                 login_user_num login_user_num, run_time run_time, occur_time occur_time,
-                update_time update_time, create_time create_time, type type, uscada_status uscada_status
+                update_time update_time, create_time create_time, type type, uscada_status uscada_status,
+                match_flag match_flag
         from monitor_host_info
     </select>
 

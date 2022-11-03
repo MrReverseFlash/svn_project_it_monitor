@@ -1,7 +1,6 @@
 package com.envisioniot.uscada.monitor.web.entity;
 
 import lombok.Data;
-import lombok.ToString;
 
 /**
  * @author hao.luo

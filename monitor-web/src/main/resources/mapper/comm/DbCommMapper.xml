@@ -23,6 +23,7 @@
 		<result column="create_time" property="createTime" />
 		<result column="update_time" property="updateTime" />
 		<result column="host_status" property="hostStatus" />
+		<result property="matchFlag" column="match_flag"/>
 	</resultMap>
 
 
@@ -58,7 +59,7 @@
 	<sql id="qryDbList">
 		t1.id id, t1.db_name db_name, t1.db_type db_type, t1.db_user db_user, t1.db_ip db_ip, t1.db_port db_port, t1.db_version db_version, t1.status status,
 		t1.host_ip host_ip, t1.db_tag db_tag, t1.up_time up_time, t1.questions questions, t1.commit_num commitNum, t1.rollback_num rollbackNum, t1.conn_max conn_max,
-		t1.use_con use_con, t1.msg msg, t1.create_time create_time, t1.update_time update_time, t2.status host_status
+		t1.use_con use_con, t1.msg msg, t1.create_time create_time, t1.update_time update_time, t2.status host_status, t2.match_flag
 	</sql>
 
 
@@ -66,7 +67,7 @@
 		t1.id id, t1.table_name table_name, t1.description description, t1.exec_sql exec_sql, t1.record_num record_num,
        	t1.create_time create_time, t1.update_time update_time, t1.db_id dbinfo_id, t2.host_ip dbinfo_host_ip,
        	t2.db_ip dbinfo_db_ip, t2.db_type dbinfo_db_type, t2.db_name dbinfo_db_name,
-       	t2.db_tag dbinfo_db_tag, t2.status dbinfo_status, t3.status dbinfo_host_status
+       	t2.db_tag dbinfo_db_tag, t2.status dbinfo_status, t3.status dbinfo_host_status, t3.match_flag dbinfo_match_flag
 	</sql>
 
 	<select id="qryDbList" resultMap="dbMap" parameterType="string">

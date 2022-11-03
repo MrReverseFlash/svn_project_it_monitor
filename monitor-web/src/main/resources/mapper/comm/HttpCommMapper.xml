@@ -16,6 +16,7 @@
 		<result column="create_time" property="createTime" />
 		<result column="update_time" property="updateTime" />
 		<result column="host_status" property="hostStatus" />
+		<result property="matchFlag" column="match_flag"/>
 	</resultMap>
 
 	<resultMap id="httpSampleReqMap" type="com.envisioniot.uscada.monitor.web.entity.HttpSampleReq">
@@ -25,7 +26,7 @@
 
 	<sql id="qryHttpList">
 		t1.id id, t1.host_ip host_ip, t1.url url, t1.service_name service_name, t1.method method, t1.body body, t1.status status, t1.response_code response_code,
-		t1.response_time response_time, t1.msg msg, t1.create_time create_time, t1.update_time update_time, t2.status host_status
+		t1.response_time response_time, t1.msg msg, t1.create_time create_time, t1.update_time update_time, t2.status host_status, t2.match_flag
 	</sql>
 
 	<select id="qryAll" resultMap="httpMap">

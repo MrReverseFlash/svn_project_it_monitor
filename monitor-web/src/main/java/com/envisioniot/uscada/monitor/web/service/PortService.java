@@ -2,7 +2,6 @@ package com.envisioniot.uscada.monitor.web.service;
 
 import com.envisioniot.uscada.monitor.web.dao.rdb.PortDao;
 import com.envisioniot.uscada.monitor.web.dao.tsdb.PortInfluxDao;
-import com.envisioniot.uscada.monitor.web.entity.HttpInfo;
 import com.envisioniot.uscada.monitor.web.entity.PortInfo;
 import com.envisioniot.uscada.monitor.web.entity.PortSampleReq;
 import com.envisioniot.uscada.monitor.web.entity.PortSampleResp;

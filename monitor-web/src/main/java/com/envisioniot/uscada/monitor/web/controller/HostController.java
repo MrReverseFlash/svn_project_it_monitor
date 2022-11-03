@@ -1,6 +1,7 @@
 package com.envisioniot.uscada.monitor.web.controller;
 
 import com.alibaba.excel.EasyExcel;
+import com.alibaba.excel.write.style.column.LongestMatchColumnWidthStyleStrategy;
 import com.envisioniot.uscada.monitor.common.entity.Response;
 import com.envisioniot.uscada.monitor.common.entity.ResponseCode;
 import com.envisioniot.uscada.monitor.web.entity.*;
@@ -43,14 +44,14 @@ public class HostController {
      */
     @GetMapping("/downloadExcel")
     public Response download(HttpServletResponse response)  {
-        // 这里注意 有同学反应使用swagger 会导致各种问题，请直接用浏览器或者用postman
-        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        response.setContentType("application/force-download");
         response.setCharacterEncoding("utf-8");
         try {
             // 这里URLEncoder.encode可以防止中文乱码 当然和easyexcel没有关系
             String fileName = URLEncoder.encode("主机信息" + System.currentTimeMillis(), "UTF-8").replaceAll("\\+", "%20");
-            response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName + ".xlsx");
-            EasyExcel.write(response.getOutputStream(), HostTable.class).sheet("sheet1").doWrite(hostService.getTimeSeriesList());
+            response.setHeader("Content-disposition", "attachment;filename=" + fileName + ".xlsx");
+            response.setHeader("Access-Control-Expose-Headers", "content-disposition");
+            EasyExcel.write(response.getOutputStream(), HostTable.class).registerWriteHandler(new LongestMatchColumnWidthStyleStrategy()).sheet("sheet1").doWrite(hostService.getTimeSeriesList());
         } catch (Exception e) {
             log.error("Excel 文件导出失败 : {}",e.getMessage());
             return new Response(ResponseCode.FAIL.getCode(),"Excel 文件导出失败 ");

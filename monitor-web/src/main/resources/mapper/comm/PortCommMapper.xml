@@ -19,6 +19,7 @@
 		<result column="create_time" property="createTime" />
 		<result column="update_time" property="updateTime" />
 		<result column="host_status" property="hostStatus" />
+		<result property="matchFlag" column="match_flag"/>
 	</resultMap>
 
 	<resultMap id="portSampleReqMap" type="com.envisioniot.uscada.monitor.web.entity.PortSampleReq">
@@ -29,7 +30,7 @@
 	<sql id="qryPortList">
 		t1.id id, t1.host_ip host_ip, t1.port port, t1.mark mark, t1.port_type port_type, t1.status status, t1.listening_num listening_num, t1.established_num established_num,
 		t1.timewait_num timewait_num, t1.closewait_num closewait_num, t1.synsent_num synsent_num, t1.idle_num idle_num, t1.msg msg, t1.create_time create_time, t1.update_time update_time,
-		t2.status host_status
+		t2.status host_status, t2.match_flag
 	</sql>
 
 	<select id="qryAll" resultMap="portMap">

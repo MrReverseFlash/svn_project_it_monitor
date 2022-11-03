@@ -12,6 +12,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * TopoController
@@ -61,14 +62,15 @@ public class TopoController {
         return new Response(ResponseCode.SUCCESS.getCode(), topoParams);
     }
 
-    @GetMapping("/insTopoParam")
-    public Response insTopoParam(@RequestParam("num") short num,
-                                 @RequestParam("name") String name,
-                                 @RequestParam("type") short type) {
+    @PostMapping("/insTopoParam")
+    public Response insTopoParam(@RequestBody Map<String, Object> data) {
+        short type = (short) (int) data.get("type");
+        short num = (short) (int) data.get("num");
+        String name = (String) data.get("name");
         if (type != 1 && type != 2 && type != 3) {
             throw new WebRequestException("类型参数值不在允许范围！");
         }
-        return new Response(ResponseCode.SUCCESS.getCode(), topoService.insTopoParam(num, name, type));
+        return new Response(ResponseCode.SUCCESS.getCode(), topoService.insTopoParam(num, name, type),"");
     }
 
     @GetMapping("/updTopoParam")

@@ -2,6 +2,7 @@ package com.envisioniot.uscada.monitor.web.controller;
 
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.excel.EasyExcel;
+import com.alibaba.excel.write.style.column.LongestMatchColumnWidthStyleStrategy;
 import com.envisioniot.uscada.monitor.common.entity.Response;
 import com.envisioniot.uscada.monitor.common.entity.ResponseCode;
 import com.envisioniot.uscada.monitor.common.entity.RunAppResp;
@@ -45,8 +46,7 @@ public class AppController {
 
     @GetMapping("/downloadExcel")
     public Response download(HttpServletResponse response, @RequestParam(name = "hostIp", required = false) String hostIp) {
-        // 这里注意 有同学反应使用swagger 会导致各种问题，请直接用浏览器或者用postman
-        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        response.setContentType("application/force-download");
         response.setCharacterEncoding("utf-8");
         try {
             List<AppTable> apps;
@@ -57,8 +57,9 @@ public class AppController {
             }
             // 这里URLEncoder.encode可以防止中文乱码 当然和easyexcel没有关系
             String fileName = URLEncoder.encode("进程信息" + System.currentTimeMillis(), "UTF-8").replaceAll("\\+", "%20");
-            response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName + ".xlsx");
-            EasyExcel.write(response.getOutputStream(), AppTable.class).sheet("sheet1").doWrite(apps);
+            response.setHeader("Content-disposition", "attachment;filename=" + fileName + ".xlsx");
+            response.setHeader("Access-Control-Expose-Headers", "Content-disposition");
+            EasyExcel.write(response.getOutputStream(), AppTable.class).registerWriteHandler(new LongestMatchColumnWidthStyleStrategy()).sheet("sheet1").doWrite(apps);
         } catch (Exception e) {
             log.error("Excel 文件导出失败 : {}", e.getMessage());
             return new Response(ResponseCode.FAIL.getCode(), "Excel 文件导出失败 ");

@@ -16,7 +16,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.envisioniot.uscada.monitor.common.util.CommConstants.HTTP;
@@ -41,16 +40,21 @@ public class AppService {
 
     @Value("${host.matchFlag}")
     private String matchFlag;
+
     public List<AppTable> getAllMonitorApp() {
         List<AppTable> appTables = appDao.getAllApp();
-        if(!CollectionUtils.isEmpty(appTables)) {
+        if (!CollectionUtils.isEmpty(appTables)) {
             appTables.forEach(appTable -> appTable.setHostMatch(matchFlag.equals(appTable.getMatchFlag())));
         }
         return appTables;
     }
 
     public List<AppTable> getAppByIp(String hostIp) {
-        return appDao.getApp(hostIp);
+        List<AppTable> appTables = appDao.getApp(hostIp);
+        if (!CollectionUtils.isEmpty(appTables)) {
+            appTables.forEach(appTable -> appTable.setHostMatch(matchFlag.equals(appTable.getMatchFlag())));
+        }
+        return appTables;
     }
 
     public void modifyName(Integer id, String name) {

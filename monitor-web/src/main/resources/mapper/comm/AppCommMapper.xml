@@ -22,12 +22,13 @@
         <result property="threadNum" column="thread_num"/>
         <result property="hostStatus" column="host_status"/>
         <result property="containerName" column="container_name"/>
+        <result property="matchFlag" column="match_flag"/>
     </resultMap>
 
     <sql id="qryAppList">
 		t1.id id, t1.host_ip host_ip, t1.app_pid app_pid, t1.app_uid app_uid, t1.app_name app_name, t1.status status, t1.start_time start_time, t1.mem_use mem_use,
 		t1.mem_per mem_per, t1.cpu_per cpu_per, t1.io_read io_read, t1.io_write io_write, t1.msg msg, t1.occur_time occur_time, t1.create_time create_time,
-		t1.update_time update_time, t1.thread_num thread_num, t1.container_name container_name, t2.status host_status
+		t1.update_time update_time, t1.thread_num thread_num, t1.container_name container_name, t2.status host_status, t2.match_flag
 	</sql>
 
     <select id="getAllApp" resultMap="AppTable">

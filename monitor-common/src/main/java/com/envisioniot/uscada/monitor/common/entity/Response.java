@@ -26,6 +26,12 @@ public class Response {
         this.msg = msg;
     }
 
+    public Response(int code, Object data,String msg) {
+        this.code = code;
+        this.data = data;
+        this.msg = msg;
+    }
+
     public Response(int code) {
         this.code = code;
     }
