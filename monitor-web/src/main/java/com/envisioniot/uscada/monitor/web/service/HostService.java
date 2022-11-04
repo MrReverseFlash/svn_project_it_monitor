@@ -107,6 +107,7 @@ public class HostService {
                 detail.setCpuIowait(res.getCpuSample().getIowait());
                 detail.setCpuUse(res.getCpuSample().getUser() + res.getCpuSample().getSystem());
                 detail.setFiveLoad(res.getSysLoadSample().getFiveLoad());
+                detail.setMemUsePer(res.getMemSample().getUsePer());
                 detail.setFifteenLoad(res.getSysLoadSample().getFifteenLoad());
                 detail.setOneLoad(res.getSysLoadSample().getOneLoad());
                 detail.setOccurTime(res.getOccurTime());

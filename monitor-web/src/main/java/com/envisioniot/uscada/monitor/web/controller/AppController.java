@@ -97,7 +97,7 @@ public class AppController {
         try {
             List<AppSampleResp> sample = appService.getSample(request);
             // 这里URLEncoder.encode可以防止中文乱码 当然和easyexcel没有关系
-            String fileName = URLEncoder.encode(request.getHostIp() + "_" + request.getAppUid() + "_" + new SimpleDateFormat(FILE_TIME_FORMAT).format(new Date()), "UTF-8").replaceAll("\\+", "%20");
+            String fileName = URLEncoder.encode(request.getHostIp() + "_" + request.getAppName() + "_" + new SimpleDateFormat(FILE_TIME_FORMAT).format(new Date()), "UTF-8").replaceAll("\\+", "%20");
             response.setHeader("Content-disposition", "attachment;filename=" + fileName + ".xlsx");
             response.setHeader("Access-Control-Expose-Headers", "Content-disposition");
             EasyExcel.write(response.getOutputStream(), AppSampleResp.class).registerWriteHandler(new LongestMatchColumnWidthStyleStrategy()).sheet("sheet1").doWrite(sample);

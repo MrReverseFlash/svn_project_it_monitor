@@ -12,4 +12,5 @@ public class AppSampleRequest {
     private String et;
     private String appUid;
     private String hostIp;
+    private String appName;
 }
