@@ -119,6 +119,11 @@ public class CommConstants {
     public static final String DEFAULT_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
     /**
+     * 默认时间格式
+     */
+    public static final String FILE_TIME_FORMAT = "yyyyMMddHHmmss";
+
+    /**
      * 数据库监控信息保存url
      */
     public static final String POST_RUN_APP_URL = "monitor-agent/getRun?exp=%s&isDocker=%s&containerName=%s";

@@ -12,8 +12,12 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
+
+import static com.envisioniot.uscada.monitor.common.util.CommConstants.FILE_TIME_FORMAT;
 
 /**
  * @author hao.luo
@@ -43,18 +47,18 @@ public class HostController {
      * 3. finish的时候会自动关闭OutputStream
      */
     @GetMapping("/downloadExcel")
-    public Response download(HttpServletResponse response)  {
+    public Response download(HttpServletResponse response) {
         response.setContentType("application/force-download");
         response.setCharacterEncoding("utf-8");
         try {
             // 这里URLEncoder.encode可以防止中文乱码 当然和easyexcel没有关系
-            String fileName = URLEncoder.encode("主机信息" + System.currentTimeMillis(), "UTF-8").replaceAll("\\+", "%20");
+            String fileName = URLEncoder.encode("主机信息" + new SimpleDateFormat(FILE_TIME_FORMAT).format(new Date()), "UTF-8").replaceAll("\\+", "%20");
             response.setHeader("Content-disposition", "attachment;filename=" + fileName + ".xlsx");
             response.setHeader("Access-Control-Expose-Headers", "content-disposition");
             EasyExcel.write(response.getOutputStream(), HostTable.class).registerWriteHandler(new LongestMatchColumnWidthStyleStrategy()).sheet("sheet1").doWrite(hostService.getTimeSeriesList());
         } catch (Exception e) {
-            log.error("Excel 文件导出失败 : {}",e.getMessage());
-            return new Response(ResponseCode.FAIL.getCode(),"Excel 文件导出失败 ");
+            log.error("Excel 文件导出失败 : {}", e.getMessage());
+            return new Response(ResponseCode.FAIL.getCode(), "Excel 文件导出失败 ");
         }
         return new Response(ResponseCode.SUCCESS.getCode());
     }
@@ -97,6 +101,27 @@ public class HostController {
                                @RequestParam("hostIp") String hostIp) {
         List<HostDetailResponse> details = hostService.getDetails(st, et, hostIp);
         return new Response(ResponseCode.SUCCESS.getCode(), details);
+    }
+
+    @GetMapping("/downloadDetailsExcel")
+    public Response downloadDetails(HttpServletResponse response,
+                                    @RequestParam("st") String st,
+                                    @RequestParam("et") String et,
+                                    @RequestParam("hostIp") String hostIp) {
+        response.setContentType("application/force-download");
+        response.setCharacterEncoding("utf-8");
+        try {
+            List<HostDetailForDownload> details = hostService.getDetailsForDownload(st, et, hostIp);
+            // 这里URLEncoder.encode可以防止中文乱码 当然和easyexcel没有关系
+            String fileName = URLEncoder.encode(hostIp + "_" + new SimpleDateFormat(FILE_TIME_FORMAT).format(new Date()), "UTF-8").replaceAll("\\+", "%20");
+            response.setHeader("Content-disposition", "attachment;filename=" + fileName + ".xlsx");
+            response.setHeader("Access-Control-Expose-Headers", "content-disposition");
+            EasyExcel.write(response.getOutputStream(), HostDetailForDownload.class).registerWriteHandler(new LongestMatchColumnWidthStyleStrategy()).sheet("sheet1").doWrite(details);
+        } catch (Exception e) {
+            log.error("Excel 文件导出失败 : {}", e.getMessage());
+            return new Response(ResponseCode.FAIL.getCode(), "Excel 文件导出失败 ");
+        }
+        return new Response(ResponseCode.SUCCESS.getCode());
     }
 
     @GetMapping("/getNetSample")

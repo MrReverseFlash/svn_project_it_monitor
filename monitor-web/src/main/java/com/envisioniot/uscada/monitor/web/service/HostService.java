@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -95,6 +96,29 @@ public class HostService {
             throw new WebRequestException(e.getMessage());
         }
     }
+
+    public List<HostDetailForDownload> getDetailsForDownload(String st, String et, String hostIp) {
+        List<HostDetailResponse> responses = getDetails(st, et, hostIp);
+        List<HostDetailForDownload> details = new ArrayList<>();
+        if (!CollectionUtils.isEmpty(responses))
+            responses.stream().forEach(res -> {
+                HostDetailForDownload detail = new HostDetailForDownload();
+                detail.setCpuIdle(res.getCpuSample().getIdle());
+                detail.setCpuIowait(res.getCpuSample().getIowait());
+                detail.setCpuUse(res.getCpuSample().getUser() + res.getCpuSample().getSystem());
+                detail.setFiveLoad(res.getSysLoadSample().getFiveLoad());
+                detail.setFifteenLoad(res.getSysLoadSample().getFifteenLoad());
+                detail.setOneLoad(res.getSysLoadSample().getOneLoad());
+                detail.setOccurTime(res.getOccurTime());
+                detail.setRxpck(res.getNetSample().getRxpck());
+                detail.setTxpck(res.getNetSample().getTxpck());
+                detail.setTxbyt(res.getNetSample().getTxbyt());
+                detail.setRxbyt(res.getNetSample().getRxbyt());
+                details.add(detail);
+            });
+        return details;
+    }
+
 
     public Map<String, List<NetSampleResponse>> getNetSample(String st, String et, String hostIp) {
         try {
