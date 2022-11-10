@@ -1,6 +1,5 @@
 package com.envisioniot.uscada.monitor.agent.service.monitor.impl;
 
-import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.lang.TypeReference;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.RuntimeUtil;
@@ -16,11 +15,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import java.nio.charset.Charset;
 import java.util.*;
 
 import static com.envisioniot.uscada.monitor.agent.util.Constants.*;
-import static com.envisioniot.uscada.monitor.common.util.CommConstants.*;
+import static com.envisioniot.uscada.monitor.common.util.CommConstants.HTTP;
+import static com.envisioniot.uscada.monitor.common.util.CommConstants.ONLINE_STATUS;
 
 
 /**

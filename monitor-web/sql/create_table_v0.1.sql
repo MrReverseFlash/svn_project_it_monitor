@@ -49,7 +49,7 @@
  CREATE TABLE IF NOT EXISTS `monitor_app_info` (
      id BIGINT(10) NOT NULL AUTO_INCREMENT,
      host_ip VARCHAR(32) NOT NULL COMMENT 'agent ip' ,
-     app_uid VARCHAR(255) NOT NULL COMMENT 'app 唯一识别标识符',
+     app_uid VARCHAR(500) NOT NULL COMMENT 'app 唯一识别标识符',
      app_pid BIGINT(10)  DEFAULT NULL COMMENT 'app id' ,
      app_name VARCHAR(128) DEFAULT NULL,
      container_name VARCHAR(255) DEFAULT NULL,
@@ -66,7 +66,7 @@
      update_time DATETIME DEFAULT NULL,
      create_time DATETIME DEFAULT NULL,
      PRIMARY KEY (id),
-     UNIQUE INDEX idx_monitor_app_info_ip(host_ip, app_uid)
+     UNIQUE INDEX idx_monitor_app_info_ip(host_ip, app_uid(255))
  );
 
 -- ----------------------------

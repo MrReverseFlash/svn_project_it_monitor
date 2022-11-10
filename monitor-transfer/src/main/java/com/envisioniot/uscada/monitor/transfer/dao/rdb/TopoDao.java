@@ -37,6 +37,12 @@ public interface TopoDao {
     void delNotExtDefRelaByHost(String hostIp, List<TopoRelaInfo> list);
 
     /**
+     * 删除不存在的默认连线关系
+     * @param hostIp
+     */
+    void delNotExtDefRelaByHost(String hostIp);
+
+    /**
      * 插入默认的连线关系
      * @param hostIp
      * @param list

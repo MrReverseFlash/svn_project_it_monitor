@@ -63,7 +63,7 @@ public class Constants {
     /**
      * get all container status
      */
-    public static final String[] DOCKER_STATS = {"docker", "stats", "--no-stream", "--format", "{\"id\":\"{{ .ID }}\",\"memPer\":\"{{ .MemPerc }}\",\"cpuPer\":\"{{ .CPUPerc }}\",\"pids\":\"{{ .PIDs }}\",\"netIO\":\"{{ .NetIO }}\",\"blockIO\":\"{{ .BlockIO }}\"}"};
+    public static final String[] DOCKER_STATS = {"docker", "stats", "--no-stream", "--format", "{\"id\":\"{{ .Name }}\",\"memPer\":\"{{ .MemPerc }}\",\"cpuPer\":\"{{ .CPUPerc }}\",\"pids\":\"{{ .PIDs }}\",\"netIO\":\"{{ .NetIO }}\",\"blockIO\":\"{{ .BlockIO }}\"}"};
 //    public static final String DOCKER_STATS = String.format("docker stats --no-stream --format \"{\\\"%s\\\":\\\"{{ .ID }}\\\",\\\"%s\\\":\\\"{{ .MemPerc }}\\\",\\\"%s\\\":\\\"{{ .CPUPerc }}\\\",\\\"%s\\\":\\\"{{ .PIDs }}\\\",\\\"%s\\\":\\\"{{ .NetIO }}\\\",\\\"%s\\\":\\\"{{ .BlockIO }}\\\"}\"",
 //            CONTAINER_ID, CONTAINER_MEMORY_PER, CONTAINER_CPU_PER, CONTAINER_PIDS, CONTAINER_NET_IO, CONTAINER_BLOCK_IO
 //    );

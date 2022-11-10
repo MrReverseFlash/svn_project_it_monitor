@@ -57,6 +57,10 @@
               #{item.gatewayIp}
           </foreach>
     </delete>
+    <delete id="delDefRelaByHost">
+        delete from monitor_topo_rela
+        where host_ip_src = #{hostIp} and is_default = 1
+    </delete>
 
     <insert id="insGwList">
         insert ignore into monitor_gateway_info

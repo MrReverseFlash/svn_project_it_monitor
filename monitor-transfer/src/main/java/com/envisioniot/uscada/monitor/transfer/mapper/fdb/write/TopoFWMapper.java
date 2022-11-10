@@ -96,4 +96,6 @@ public interface TopoFWMapper {
      * @param param
      */
     void insTopoParam_insert_later(@Param("param") TopoParam param);
+
+    void delDefRelaByHost(String hostIp);
 }

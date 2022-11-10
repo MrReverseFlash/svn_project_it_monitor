@@ -46,6 +46,11 @@ public class TopoFdbDao extends TopoCommDao {
     }
 
     @Override
+    public void delNotExtDefRelaByHost(String hostIp) {
+        topoFWMapper.delDefRelaByHost(hostIp);
+    }
+
+    @Override
     public void insDefRelaByHost(String hostIp, List<TopoRelaInfo> list) {
         topoFWMapper.insDefRelaByHost_update_first(hostIp, list);
         topoFWMapper.insDefRelaByHost_insert_later(hostIp, list);

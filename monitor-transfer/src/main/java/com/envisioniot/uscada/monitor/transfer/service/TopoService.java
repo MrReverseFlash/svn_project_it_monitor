@@ -41,6 +41,8 @@ public class TopoService {
                     topoDao.insAssociatedHost(relaInfoList);
                     topoDao.delNotExtDefRelaByHost(hostIp, relaInfoList);
                     topoDao.insDefRelaByHost(hostIp, relaInfoList);
+                } else {
+                    topoDao.delNotExtDefRelaByHost(hostIp);
                 }
                 //2.插入网关列表
                 if (!CollectionUtils.isEmpty(gatewayInfoList)) {

@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.ini4j.Ini;
 import org.ini4j.IniPreferences;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -29,6 +30,9 @@ import static com.envisioniot.uscada.monitor.common.util.CommConstants.HTTP;
 @Slf4j
 public class TopoServiceImpl extends AbstractMonitorService<CommStat<TopoInfo>, List<String>> {
 
+    @Value("${relaEnabled:false}")
+    private Boolean relaEnabled;
+
     /**
      * #1. 网关状态信息：
      * 根据缓存的网关列表，检测它们的状态，并传至服务端。
@@ -43,7 +47,7 @@ public class TopoServiceImpl extends AbstractMonitorService<CommStat<TopoInfo>, 
         CommStat<TopoInfo> reqBody = new CommStat<>();
         reqBody.setHostIp(commonConfig.getLocalIp());
         TopoInfo topoInfo = new TopoInfo();
-        try{
+        try {
             //网关状态信息
             if (!CollectionUtils.isEmpty(gatewayIpList)) {
                 List<GatewayInfo> gatewayInfoList = gatewayIpList.parallelStream().map(gatewayIp -> {
@@ -59,7 +63,7 @@ public class TopoServiceImpl extends AbstractMonitorService<CommStat<TopoInfo>, 
                         } else {
                             gatewayInfo.setStatus((short) 0);
                         }
-                    } catch (Exception e){
+                    } catch (Exception e) {
                         log.error(e.getMessage(), e);
                         gatewayInfo.setStatus((short) 0);
                     }
@@ -83,7 +87,7 @@ public class TopoServiceImpl extends AbstractMonitorService<CommStat<TopoInfo>, 
                         } else {
                             topoRelaInfo.setStatus((short) 0);
                         }
-                    } catch (Exception e){
+                    } catch (Exception e) {
                         log.error(e.getMessage(), e);
                         topoRelaInfo.setStatus((short) 0);
                     }
@@ -144,7 +148,7 @@ public class TopoServiceImpl extends AbstractMonitorService<CommStat<TopoInfo>, 
             //获取网关IP
             try {
                 gatewayIpList = RuntimeUtil.execForLines(GET_GATEWAY_LIST);
-            } catch (Exception e){
+            } catch (Exception e) {
                 log.error(e.getMessage(), e);
             }
             if (!CollectionUtils.isEmpty(gatewayIpList)) {
@@ -167,78 +171,80 @@ public class TopoServiceImpl extends AbstractMonitorService<CommStat<TopoInfo>, 
                 }
             }
 
-            //解析system.sys、DB_HOST文件生成默认集合关系以及默认连线关系
-            List<String> sameSetHostIpList = null;
-            String prjhome = System.getenv("PRJHOME");
-            if (!StringUtils.isEmpty(prjhome)) {
-                File iniFile = new File(prjhome + DOCKER_INI_PATH_SUFFIX);
-                File sysFile = new File(prjhome + SYSTEM_SYS_PATH_SUFFIX);
-                if (iniFile.exists() && iniFile.isFile() && sysFile.exists() && sysFile.isFile()) {
-                    Ini ini = new Ini(iniFile);
-                    Preferences prefs = new IniPreferences(ini);
-                    String uscadaHostName = prefs.node("foundation config").get("HOSTNAME", null);
-                    if (!StringUtils.isEmpty(uscadaHostName)) {
-                        GET_SAME_SET_LIST[2] = GET_SAME_SET_LIST[2].replaceFirst("USCADAHOSTNAME", uscadaHostName.toLowerCase());
-                        try{
-                            sameSetHostIpList = RuntimeUtil.execForLines(GET_SAME_SET_LIST);
-                        } catch (Exception e){
-                            log.error(e.getMessage(), e);
+            List<TopoRelaInfo> relaInfoList = null;
+            //默认不生成连线
+            if (relaEnabled) {
+                //解析system.sys、DB_HOST文件生成默认集合关系以及默认连线关系
+                List<String> sameSetHostIpList = null;
+                String prjhome = System.getenv("PRJHOME");
+                if (!StringUtils.isEmpty(prjhome)) {
+                    File iniFile = new File(prjhome + DOCKER_INI_PATH_SUFFIX);
+                    File sysFile = new File(prjhome + SYSTEM_SYS_PATH_SUFFIX);
+                    if (iniFile.exists() && iniFile.isFile() && sysFile.exists() && sysFile.isFile()) {
+                        Ini ini = new Ini(iniFile);
+                        Preferences prefs = new IniPreferences(ini);
+                        String uscadaHostName = prefs.node("foundation config").get("HOSTNAME", null);
+                        if (!StringUtils.isEmpty(uscadaHostName)) {
+                            GET_SAME_SET_LIST[2] = GET_SAME_SET_LIST[2].replaceFirst("USCADAHOSTNAME", uscadaHostName.toLowerCase());
+                            try {
+                                sameSetHostIpList = RuntimeUtil.execForLines(GET_SAME_SET_LIST);
+                            } catch (Exception e) {
+                                log.error(e.getMessage(), e);
+                            }
                         }
                     }
                 }
-            }
-            String dbHost = System.getenv("DB_HOST");
-            if (!StringUtils.isEmpty(dbHost) && !dbHost.equals(hostIp)) {
-                if (sameSetHostIpList == null) {
-                    sameSetHostIpList = new LinkedList<>();
-                } else {
-                    //放到这做校验，可以减少判断逻辑语句
-                    // 通过第一个元素的形式判断是否正确获取到主机IP
-                    String firstIp = sameSetHostIpList.get(0);
-                    if (!firstIp.matches(IP_PATTERN)) {
-                        log.error("Ip format of system.sys is not correct: " + firstIp);
-                        sameSetHostIpList.clear();
+                String dbHost = System.getenv("DB_HOST");
+                if (!StringUtils.isEmpty(dbHost) && !dbHost.equals(hostIp)) {
+                    if (sameSetHostIpList == null) {
+                        sameSetHostIpList = new LinkedList<>();
+                    } else {
+                        //放到这做校验，可以减少判断逻辑语句
+                        // 通过第一个元素的形式判断是否正确获取到主机IP
+                        String firstIp = sameSetHostIpList.get(0);
+                        if (!firstIp.matches(IP_PATTERN)) {
+                            log.error("Ip format of system.sys is not correct: " + firstIp);
+                            sameSetHostIpList.clear();
+                        }
                     }
+                    // DB_HOST的IP格式不做校验
+                    sameSetHostIpList.add(dbHost);
                 }
-                // DB_HOST的IP格式不做校验
-                sameSetHostIpList.add(dbHost);
-            }
-            HashSet<String> sameSetHostIpSet = null;
-            List<TopoRelaInfo> relaInfoList = null;
-            int sameSetSize = 0;
-            if (!CollectionUtils.isEmpty(sameSetHostIpList)) {
-                sameSetHostIpSet = new HashSet<>(sameSetHostIpList);
-                sameSetHostIpList.clear();
-                sameSetHostIpList.addAll(sameSetHostIpSet);
-                sameSetSize = sameSetHostIpList.size();
-                topoInfo.setSameSetHostIpList(sameSetHostIpList);
-                relaInfoList = sameSetHostIpList.parallelStream().map(sameSet -> {
-                    TopoRelaInfo topoRelaInfo = new TopoRelaInfo();
-                    topoRelaInfo.setHostIpTarget(sameSet);
-                    return topoRelaInfo;
-                }).collect(Collectors.toList());
-            }
-
-            //解析ied_info表生成默认单向连线关系
-            List<Integer> iedHostIpList = null;
-            try {
-                iedHostIpList = scadaMapper.getDistinctHostIp();
-            } catch (Exception e) {
-                log.info("Perhaps there is no datasource can be created by this host: ", e);
-            }
-            if (!CollectionUtils.isEmpty(iedHostIpList)) {
-                HashSet<String> relaInfoSet = new HashSet<>(sameSetSize + iedHostIpList.size());
-                if (sameSetSize > 0) {
-                    relaInfoSet.addAll(sameSetHostIpSet);
-                } else {
-                    relaInfoList = new LinkedList<>();
-                }
-                for (int iedHostIp : iedHostIpList) {
-                    String formatIp = convertIp(iedHostIp);
-                    if (relaInfoSet.add(formatIp)) {
+                HashSet<String> sameSetHostIpSet = null;
+                int sameSetSize = 0;
+                if (!CollectionUtils.isEmpty(sameSetHostIpList)) {
+                    sameSetHostIpSet = new HashSet<>(sameSetHostIpList);
+                    sameSetHostIpList.clear();
+                    sameSetHostIpList.addAll(sameSetHostIpSet);
+                    sameSetSize = sameSetHostIpList.size();
+                    topoInfo.setSameSetHostIpList(sameSetHostIpList);
+                    relaInfoList = sameSetHostIpList.parallelStream().map(sameSet -> {
                         TopoRelaInfo topoRelaInfo = new TopoRelaInfo();
-                        topoRelaInfo.setHostIpTarget(formatIp);
-                        relaInfoList.add(topoRelaInfo);
+                        topoRelaInfo.setHostIpTarget(sameSet);
+                        return topoRelaInfo;
+                    }).collect(Collectors.toList());
+                }
+                //解析ied_info表生成默认单向连线关系
+                List<Integer> iedHostIpList = null;
+                try {
+                    iedHostIpList = scadaMapper.getDistinctHostIp();
+                } catch (Exception e) {
+                    log.info("Perhaps there is no datasource can be created by this host: ", e);
+                }
+                if (!CollectionUtils.isEmpty(iedHostIpList)) {
+                    HashSet<String> relaInfoSet = new HashSet<>(sameSetSize + iedHostIpList.size());
+                    if (sameSetSize > 0) {
+                        relaInfoSet.addAll(sameSetHostIpSet);
+                    } else {
+                        relaInfoList = new LinkedList<>();
+                    }
+                    for (int iedHostIp : iedHostIpList) {
+                        String formatIp = convertIp(iedHostIp);
+                        if (relaInfoSet.add(formatIp)) {
+                            TopoRelaInfo topoRelaInfo = new TopoRelaInfo();
+                            topoRelaInfo.setHostIpTarget(formatIp);
+                            relaInfoList.add(topoRelaInfo);
+                        }
                     }
                 }
             }

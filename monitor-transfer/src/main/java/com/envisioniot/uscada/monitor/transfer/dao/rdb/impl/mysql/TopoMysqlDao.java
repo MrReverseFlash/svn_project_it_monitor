@@ -38,6 +38,11 @@ public class TopoMysqlDao extends TopoCommDao {
     }
 
     @Override
+    public void delNotExtDefRelaByHost(String hostIp) {
+        topoMysqlMapper.delDefRelaByHost(hostIp);
+    }
+
+    @Override
     public void insDefRelaByHost(String hostIp, List<TopoRelaInfo> list) {
         topoMysqlMapper.insDefRelaByHost(hostIp, list);
     }

@@ -6,7 +6,10 @@ import cn.hutool.core.util.RuntimeUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.envisioniot.uscada.monitor.agent.service.monitor.AbstractMonitorService;
-import com.envisioniot.uscada.monitor.common.entity.*;
+import com.envisioniot.uscada.monitor.common.entity.CommStat;
+import com.envisioniot.uscada.monitor.common.entity.ContainerStat;
+import com.envisioniot.uscada.monitor.common.entity.TaskEnum;
+import com.envisioniot.uscada.monitor.common.entity.TaskInfo;
 import com.envisioniot.uscada.monitor.common.util.CommConstants;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -19,6 +22,7 @@ import java.util.List;
 
 import static com.envisioniot.uscada.monitor.agent.util.Constants.*;
 import static com.envisioniot.uscada.monitor.common.util.CommConstants.HTTP;
+import static java.util.stream.Collectors.toList;
 
 /**
  * @author hao.luo
@@ -78,22 +82,16 @@ public class DockerServiceImpl extends AbstractMonitorService<CommStat<Container
     private List<ContainerStat> getMonitorContainer(List<String> containers) {
         List<ContainerStat> result = new ArrayList<>(2);
         List<ContainerStat> allContainer = getAllContainer();
-        containers.forEach((container) -> {
-            ContainerStat stat = null;
-            for (ContainerStat containerStat : allContainer) {
-                if (container.equalsIgnoreCase(containerStat.getId())) {
-                    stat = containerStat;
-                    break;
-                }
-            }
-            if (stat != null) {
-                result.add(stat);
-            } else {
-                stat = new ContainerStat();
-                stat.setId(container);
-                stat.setMsg("container not exist.");
-            }
-        });
+        List<String> allContainerIds = allContainer.stream().map(containerStat -> containerStat.getId()).collect(toList());
+        List<String> deadContainerIds = containers.stream().filter(containerId -> !allContainerIds.contains(containerId)).collect(toList());
+        result.addAll(allContainer);
+        for (String id : deadContainerIds) {
+            ContainerStat stat = new ContainerStat();
+            stat.setId(id);
+            result.add(stat);
+        }
+        log.info("result size :"+result.size());
+
         return result;
     }
 
@@ -115,8 +113,8 @@ public class DockerServiceImpl extends AbstractMonitorService<CommStat<Container
     private ContainerStat convertToContainer(JSONObject jsonObject) {
         ContainerStat containerStat = new ContainerStat();
         // 容器id
-        //todo 改为name
-        containerStat.setId(jsonObject.getStr(CONTAINER_ID));
+        //改为name
+        containerStat.setId(jsonObject.getStr(CONTAINER_NAME));
         // 容器的名称
         containerStat.setName(jsonObject.getStr(CONTAINER_NAME));
         // 容器的镜像
@@ -157,7 +155,7 @@ public class DockerServiceImpl extends AbstractMonitorService<CommStat<Container
     private ContainerStat convertToContainerHealth(JSONObject jsonObject) {
         ContainerStat containerStat = new ContainerStat();
         // 容器id
-        // todo 改为container name
+        //执行命令时 实际已经改成使用name
         containerStat.setId(jsonObject.getStr(CONTAINER_ID));
         // 进程个数
         String pids = jsonObject.getStr(CONTAINER_PIDS);

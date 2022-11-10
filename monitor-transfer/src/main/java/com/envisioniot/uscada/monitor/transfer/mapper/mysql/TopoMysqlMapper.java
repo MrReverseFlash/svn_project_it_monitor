@@ -83,4 +83,6 @@ public interface TopoMysqlMapper {
      */
     void insTopoParam(@Param("param") TopoParam param);
 
+    void delDefRelaByHost(@Param("hostIp") String hostIp);
+
 }
